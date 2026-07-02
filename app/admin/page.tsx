@@ -39,18 +39,23 @@ export default function AdminPage() {
   const [filterDiv, setFilterDiv] = useState("All");
   const [toast, setToast] = useState("");
 
+  const [backendError, setBackendError] = useState("");
+
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   useEffect(() => { if (isLoggedIn()) { setAuthed(true); } }, []);
 
   const load = useCallback(async (t: Tab) => {
     setLoading(true);
+    setBackendError("");
     try {
       if (t === "dashboard") setStats(await getStats());
       else if (t === "applications") setApplications(await getApplications());
       else if (t === "messages") setMessages(await getMessages());
       else if (t === "members") setMembers(await getCoreMembers());
-    } catch {}
+    } catch (e: any) {
+      setBackendError(e.message || "Cannot connect to backend.");
+    }
     setLoading(false);
   }, []);
 
@@ -59,7 +64,13 @@ export default function AdminPage() {
   const login = async () => {
     setLoginLoading(true); setLoginError("");
     try { await adminLogin(password); setAuthed(true); }
-    catch (e: any) { setLoginError(e.message); }
+    catch (e: any) {
+      if (e.message?.includes("fetch")) {
+        setLoginError("Cannot reach backend. Check your NEXT_PUBLIC_API_URL in Vercel.");
+      } else {
+        setLoginError(e.message || "Login failed.");
+      }
+    }
     setLoginLoading(false);
   };
 
@@ -138,6 +149,15 @@ export default function AdminPage() {
     <div className="min-h-screen section-bg pt-20">
       {toast && (
         <div className="fixed top-24 right-4 z-50 px-4 py-2 bg-green-600 text-white text-sm rounded-xl shadow-lg">{toast}</div>
+      )}
+
+      {backendError && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 bg-red-600/90 text-white text-sm rounded-xl shadow-lg max-w-md text-center">
+          ⚠️ Backend unreachable: <span className="font-semibold">{backendError}</span>
+          <div className="text-xs mt-1 text-red-200">
+            Make sure <code>NEXT_PUBLIC_API_URL</code> is set in Vercel and the Render backend is running.
+          </div>
+        </div>
       )}
 
       {/* Sidebar + Content layout */}
