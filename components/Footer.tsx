@@ -24,7 +24,7 @@ const footerLinks = {
   ],
 };
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://spaceclub.onrender.com";
 
 const fallbackFaculty = [
   { _id: "1", name: "Dr. Jaisukh Paul", role: "Faculty Head", avatar: "JP", color: "bg-blue-600", type: "faculty" },

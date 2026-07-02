@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://spaceclub.onrender.com";
 
 function getToken() {
   return typeof window !== "undefined" ? localStorage.getItem("admin_token") : null;
