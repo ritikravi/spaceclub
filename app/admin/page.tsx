@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Users, Mail, FileText, LayoutDashboard, Plus, Trash2,
-  Edit2, Save, X, LogOut, Check, Eye, RefreshCw, Lock
+  Edit2, Save, X, LogOut, Check, Eye, RefreshCw, Lock,
+  Link2, GitBranch
 } from "lucide-react";
 import {
   adminLogin, adminLogout, isLoggedIn,
@@ -18,7 +19,7 @@ const roles = ["Faculty Head","Faculty Coordinator","Student Lead","Division Hea
 const types = ["faculty","student-lead","core"];
 const avatarColors = ["bg-blue-600","bg-purple-600","bg-cyan-600","bg-indigo-600","bg-pink-600","bg-green-600","bg-orange-600","bg-rose-600"];
 
-const blankMember = () => ({ name:"", role:"Core Member", division:"Software", year:"", email:"", type:"core", order:99 });
+const blankMember = () => ({ name:"", role:"Core Member", division:"Software", year:"", email:"", type:"core", order:99, photo:"", linkedin:"", github:"" });
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -303,7 +304,14 @@ export default function AdminPage() {
                   <div className="glass rounded-2xl p-6 mb-4 border border-blue-400/30">
                     <h3 className="font-semibold text-blue-400 mb-4">{adding?"New Member":"Edit Member"}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                      {[{label:"Full Name *",key:"name",ph:"e.g. Arjun Sharma",type:"text"},{label:"Email",key:"email",ph:"member@lpu.in",type:"email"},{label:"Year / Designation",key:"year",ph:"2nd Year / Faculty",type:"text"}].map(({label,key,ph,type})=>(
+                      {[
+                        {label:"Full Name *",key:"name",ph:"e.g. Arjun Sharma",type:"text"},
+                        {label:"Email",key:"email",ph:"member@lpu.in",type:"email"},
+                        {label:"Year / Designation",key:"year",ph:"2nd Year / Faculty",type:"text"},
+                        {label:"Photo URL",key:"photo",ph:"https://... or leave blank",type:"text"},
+                        {label:"LinkedIn URL",key:"linkedin",ph:"https://linkedin.com/in/...",type:"text"},
+                        {label:"GitHub URL",key:"github",ph:"https://github.com/...",type:"text"},
+                      ].map(({label,key,ph,type})=>(
                         <div key={key}>
                           <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>{label}</label>
                           <input type={type} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={ph}
@@ -336,17 +344,27 @@ export default function AdminPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredMembers.map((m,i)=>(
                     <div key={m._id} className="glass glass-hover rounded-2xl p-5 flex items-start gap-4">
-                      <div className={`w-11 h-11 ${avatarColors[i%avatarColors.length]} rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0`}>
-                        {m.avatar||m.name?.slice(0,2).toUpperCase()}
+                      <div className="shrink-0">
+                        {m.photo ? (
+                          <img src={m.photo} alt={m.name} className="w-11 h-11 rounded-full object-cover border-2 border-blue-400/30" />
+                        ) : (
+                          <div className={`w-11 h-11 ${avatarColors[i%avatarColors.length]} rounded-full flex items-center justify-center text-white font-bold text-sm`}>
+                            {m.avatar||m.name?.slice(0,2).toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-sm truncate" style={{color:"var(--text)"}}>{m.name}</div>
                         <div className="text-xs text-blue-400 font-medium">{m.role}</div>
                         <div className="text-xs mt-0.5" style={{color:"var(--text-faint)"}}>{m.division} · {m.year}</div>
                         {m.email&&<div className="text-xs truncate mt-0.5" style={{color:"var(--text-faint)"}}>{m.email}</div>}
+                        <div className="flex gap-2 mt-1.5">
+                          {m.linkedin&&<a href={m.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1 transition-colors"><Link2 size={10}/>LinkedIn</a>}
+                          {m.github&&<a href={m.github} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white text-xs flex items-center gap-1 transition-colors"><GitBranch size={10}/>GitHub</a>}
+                        </div>
                       </div>
                       <div className="flex gap-1 shrink-0">
-                        <button onClick={()=>{setEditId(m._id);setAdding(false);setForm({name:m.name,role:m.role,division:m.division,year:m.year,email:m.email,type:m.type,order:m.order});}}
+                        <button onClick={()=>{setEditId(m._id);setAdding(false);setForm({name:m.name,role:m.role,division:m.division,year:m.year,email:m.email,type:m.type,order:m.order,photo:m.photo||"",linkedin:m.linkedin||"",github:m.github||""});}}
                           className="w-8 h-8 rounded-lg flex items-center justify-center hover:text-blue-400 transition-all"
                           style={{background:"var(--bg-alt)",color:"var(--text-muted)"}}><Edit2 size={13}/></button>
                         <button onClick={()=>delMember(m._id)}

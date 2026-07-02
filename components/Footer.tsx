@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Rocket, GitBranch, Camera, Link2, Mail, MessageCircle } from "lucide-react";
 
 const footerLinks = {
@@ -22,67 +24,145 @@ const footerLinks = {
   ],
 };
 
-const faculty = [
-  { name: "Dr. Jaisukh Paul", role: "Faculty Head", avatar: "JP", color: "bg-blue-600" },
-  { name: "Rohan Kumar", role: "Faculty Coordinator", avatar: "RK", color: "bg-indigo-600" },
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+const fallbackFaculty = [
+  { _id: "1", name: "Dr. Jaisukh Paul", role: "Faculty Head", avatar: "JP", color: "bg-blue-600", type: "faculty" },
+  { _id: "2", name: "Rohan Kumar", role: "Faculty Coordinator", avatar: "RK", color: "bg-indigo-600", type: "faculty" },
 ];
 
-const leads = [
-  { name: "Ayush Pratap Singh", role: "Student Lead", avatar: "AS", color: "bg-purple-600" },
-  { name: "Ritik Raushan", role: "Student Lead", avatar: "RR", color: "bg-cyan-600" },
+const fallbackLeads = [
+  { _id: "3", name: "Ayush Pratap Singh", role: "Student Lead", avatar: "AS", color: "bg-purple-600", type: "student-lead" },
+  { _id: "4", name: "Ritik Raushan", role: "Student Lead", avatar: "RR", color: "bg-cyan-600", type: "student-lead" },
 ];
+
+const avatarColors = ["bg-blue-600","bg-purple-600","bg-cyan-600","bg-indigo-600","bg-pink-600","bg-green-600","bg-orange-600","bg-rose-600"];
+
+type Member = {
+  _id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+  photo?: string;
+  linkedin?: string;
+  github?: string;
+  type: string;
+  color?: string;
+};
+
+function MemberCard({ m, idx }: { m: Member; idx: number }) {
+  const color = m.color || avatarColors[idx % avatarColors.length];
+  return (
+    <div className="flex-shrink-0 flex flex-col items-center gap-1.5 group">
+      {/* Avatar / Photo */}
+      <div className="relative">
+        {m.photo ? (
+          <img src={m.photo} alt={m.name}
+            className="w-12 h-12 rounded-full object-cover border-2 border-white/10 group-hover:border-blue-400/60 transition-all" />
+        ) : (
+          <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-white/10 group-hover:border-blue-400/60 transition-all`}>
+            {m.avatar || m.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()}
+          </div>
+        )}
+        {/* Social links hover overlay */}
+        {(m.linkedin || m.github) && (
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all flex gap-1">
+            {m.linkedin && (
+              <a href={m.linkedin} target="_blank" rel="noopener noreferrer"
+                className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
+                title="LinkedIn">
+                <Link2 size={9} className="text-white" />
+              </a>
+            )}
+            {m.github && (
+              <a href={m.github} target="_blank" rel="noopener noreferrer"
+                className="w-5 h-5 bg-gray-700 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
+                title="GitHub">
+                <GitBranch size={9} className="text-white" />
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="text-center">
+        <div className="text-xs font-semibold leading-tight" style={{ color: "var(--text)" }}>{m.name.split(" ").slice(0, 2).join(" ")}</div>
+        <div className="text-[10px] leading-tight" style={{ color: "var(--text-faint)" }}>{m.role}</div>
+      </div>
+    </div>
+  );
+}
+
+function ScrollBox({ title, color, members, boxRef }: { title: string; color: string; members: Member[]; boxRef: React.RefObject<HTMLDivElement | null> }) {
+  return (
+    <div className="flex-1 min-w-0">
+      <p className={`text-xs font-semibold uppercase tracking-widest mb-3 ${color}`}>{title}</p>
+      <div
+        ref={boxRef}
+        className="flex gap-5 overflow-x-auto pb-2 pr-2 scroll-smooth"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          maxWidth: "100%",
+        }}
+      >
+        {members.map((m, i) => <MemberCard key={m._id} m={m} idx={i} />)}
+        {members.length === 0 && (
+          <p className="text-xs italic" style={{ color: "var(--text-faint)" }}>No members yet.</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Footer() {
+  const [faculty, setFaculty] = useState<Member[]>(fallbackFaculty);
+  const [leads, setLeads] = useState<Member[]>(fallbackLeads);
+  const facultyRef = useRef<HTMLDivElement>(null);
+  const leadsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch(`${API}/api/admin/public-members`)
+      .then(r => r.json())
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        setFaculty(data.filter((m: Member) => m.type === "faculty"));
+        setLeads(data.filter((m: Member) => m.type === "student-lead"));
+      })
+      .catch(() => {}); // silently fall back to defaults
+  }, []);
+
   return (
     <footer className="border-t" style={{ background: "var(--bg-alt)", borderColor: "var(--border)" }}>
       {/* Team strip */}
-      <div className="border-b py-8" style={{ borderColor: "var(--border)" }}>
+      <div className="border-b py-6" style={{ borderColor: "var(--border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
-            {/* Faculty */}
-            <div>
-              <p className="text-xs font-semibold text-blue-400 uppercase tracking-widest mb-3">Guided By — Faculty</p>
-              <div className="flex gap-4">
-                {faculty.map((f) => (
-                  <div key={f.name} className="flex items-center gap-3">
-                    <div className={`w-10 h-10 ${f.color} rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                      {f.avatar}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>{f.name}</div>
-                      <div className="text-xs" style={{ color: "var(--text-faint)" }}>{f.role}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="flex flex-col md:flex-row gap-6 items-start">
 
-            <div className="hidden md:block w-px h-12 bg-[var(--border)]" />
+            {/* Faculty box */}
+            <ScrollBox
+              title="Guided By — Faculty"
+              color="text-blue-400"
+              members={faculty}
+              boxRef={facultyRef}
+            />
 
-            {/* Student Leads */}
-            <div>
-              <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-3">Led By — Students</p>
-              <div className="flex gap-4">
-                {leads.map((l) => (
-                  <div key={l.name} className="flex items-center gap-3">
-                    <div className={`w-10 h-10 ${l.color} rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0`}>
-                      {l.avatar}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold" style={{ color: "var(--text)" }}>{l.name}</div>
-                      <div className="text-xs" style={{ color: "var(--text-faint)" }}>{l.role}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className="hidden md:block w-px self-stretch" style={{ background: "var(--border)" }} />
 
-            <div className="hidden md:block w-px h-12 bg-[var(--border)]" />
+            {/* Student leads box */}
+            <ScrollBox
+              title="Led By — Students"
+              color="text-purple-400"
+              members={leads}
+              boxRef={leadsRef}
+            />
 
-            {/* Admin link */}
-            <div>
+            <div className="hidden md:block w-px self-stretch" style={{ background: "var(--border)" }} />
+
+            {/* Admin */}
+            <div className="shrink-0">
               <p className="text-xs font-semibold text-green-400 uppercase tracking-widest mb-3">Club Admin</p>
-              <Link href="/admin" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 border border-blue-400/30 text-blue-400 text-xs font-medium rounded-lg transition-all">
+              <Link href="/admin"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 border border-blue-400/30 text-blue-400 text-xs font-medium rounded-lg transition-all">
                 🔐 Admin Portal
               </Link>
             </div>

@@ -1,5 +1,5 @@
 import SectionHeading from "@/components/SectionHeading";
-import { Target, Eye, Rocket, Trophy, BookOpen, Users, Building2 } from "lucide-react";
+import { Target, Eye, Rocket, Trophy, BookOpen, Users, Building2, Link2, GitBranch } from "lucide-react";
 
 const faculty = [
   {
@@ -8,6 +8,9 @@ const faculty = [
     dept: "Space Sciences, LPU",
     avatar: "JP",
     color: "bg-blue-600",
+    photo: "",
+    linkedin: "",
+    github: "",
     bio: "Leading the academic vision of the Space Club, guiding students in research, satellite missions, and space technology innovation.",
   },
   {
@@ -16,6 +19,9 @@ const faculty = [
     dept: "Aerospace Engineering, LPU",
     avatar: "RK",
     color: "bg-indigo-600",
+    photo: "",
+    linkedin: "",
+    github: "",
     bio: "Coordinating club activities, mentoring project teams, and building industry connections for students pursuing space careers.",
   },
 ];
@@ -27,6 +33,9 @@ const studentLeads = [
     dept: "B.Tech, LPU",
     avatar: "AS",
     color: "bg-purple-600",
+    photo: "",
+    linkedin: "",
+    github: "",
     bio: "Driving the technical and operational vision of the club, leading hackathon teams and satellite project initiatives.",
   },
   {
@@ -35,6 +44,9 @@ const studentLeads = [
     dept: "B.Tech CSE, LPU",
     avatar: "RR",
     color: "bg-cyan-600",
+    photo: "",
+    linkedin: "",
+    github: "",
     bio: "Heading the Software & Innovation division, building the club's digital infrastructure and outreach platforms.",
   },
 ];
@@ -95,13 +107,21 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {faculty.map((f) => (
               <div key={f.name} className="glass glass-hover rounded-2xl p-7 text-center">
-                <div className={`w-20 h-20 ${f.color} rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg`}>
-                  {f.avatar}
+                <div className="mx-auto mb-4">
+                  {f.photo ? (
+                    <img src={f.photo} alt={f.name} className="w-20 h-20 rounded-full object-cover mx-auto border-4 border-blue-400/30 shadow-lg" />
+                  ) : (
+                    <div className={`w-20 h-20 ${f.color} rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-lg`}>{f.avatar}</div>
+                  )}
                 </div>
                 <div className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">{f.role}</div>
                 <h3 className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>{f.name}</h3>
                 <div className="text-xs mb-3" style={{ color: "var(--text-faint)" }}>{f.dept}</div>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{f.bio}</p>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-muted)" }}>{f.bio}</p>
+                <div className="flex justify-center gap-3">
+                  {f.linkedin && <a href={f.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"><Link2 size={12}/>LinkedIn</a>}
+                  {f.github && <a href={f.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"><GitBranch size={12}/>GitHub</a>}
+                </div>
               </div>
             ))}
           </div>
@@ -115,13 +135,21 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {studentLeads.map((s) => (
               <div key={s.name} className="glass glass-hover rounded-2xl p-7 text-center">
-                <div className={`w-20 h-20 ${s.color} rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4 shadow-lg`}>
-                  {s.avatar}
+                <div className="mx-auto mb-4">
+                  {s.photo ? (
+                    <img src={s.photo} alt={s.name} className="w-20 h-20 rounded-full object-cover mx-auto border-4 border-purple-400/30 shadow-lg" />
+                  ) : (
+                    <div className={`w-20 h-20 ${s.color} rounded-full flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-lg`}>{s.avatar}</div>
+                  )}
                 </div>
                 <div className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-1">{s.role}</div>
                 <h3 className="text-xl font-bold mb-1" style={{ color: "var(--text)" }}>{s.name}</h3>
                 <div className="text-xs mb-3" style={{ color: "var(--text-faint)" }}>{s.dept}</div>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>{s.bio}</p>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--text-muted)" }}>{s.bio}</p>
+                <div className="flex justify-center gap-3">
+                  {s.linkedin && <a href={s.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"><Link2 size={12}/>LinkedIn</a>}
+                  {s.github && <a href={s.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"><GitBranch size={12}/>GitHub</a>}
+                </div>
               </div>
             ))}
           </div>

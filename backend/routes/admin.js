@@ -71,6 +71,15 @@ router.delete("/messages/:id", auth, async (req, res) => {
 });
 
 // ── CORE MEMBERS ───────────────────────────────────────
+// GET all core members (public — no auth)
+router.get("/public-members", async (req, res) => {
+  try {
+    const list = await CoreMember.find().sort({ order: 1, createdAt: 1 })
+      .select("name role division year avatar photo linkedin github type");
+    res.json(list);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
 // GET all core members
 router.get("/core-members", auth, async (req, res) => {
   try {
