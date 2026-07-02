@@ -19,6 +19,7 @@ mongoose
 app.use("/api/join", require("./routes/join"));
 app.use("/api/contact", require("./routes/contact"));
 app.use("/api/events", require("./routes/events"));
+app.use("/api/admin", require("./routes/admin"));
 
 // Health check
 app.get("/", (req, res) => res.json({ status: "Space Club API running 🚀" }));
