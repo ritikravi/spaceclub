@@ -26,60 +26,54 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-[#050a14]/90 backdrop-blur-md border-b border-white/10 shadow-lg" : "bg-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      scrolled ? "bg-white shadow-md border-b border-gray-200" : "bg-white/95 border-b border-gray-100"
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400/50 flex items-center justify-center">
-            <Rocket size={18} className="text-blue-400" />
+          <div className="w-9 h-9 rounded-lg bg-orange-500 flex items-center justify-center">
+            <Rocket size={18} className="text-white" />
           </div>
-          <span className="font-bold text-lg text-white">
-            Space<span className="text-blue-400">Club</span>
-          </span>
+          <div>
+            <span className="font-bold text-base text-gray-900">Space</span>
+            <span className="font-bold text-base text-orange-500">Club</span>
+            <div className="text-[10px] text-gray-400 leading-none -mt-0.5">LPU</div>
+          </div>
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-1">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm text-slate-300 hover:text-blue-400 transition-colors"
+              className="px-3 py-2 text-sm text-gray-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all"
             >
               {l.label}
             </Link>
           ))}
           <Link
             href="/join"
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition-colors font-medium"
+            className="ml-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg transition-colors font-semibold shadow-sm"
           >
             Join Club
           </Link>
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          className="lg:hidden text-white"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
+        <button className="lg:hidden text-gray-700" onClick={() => setOpen(!open)} aria-label="Toggle menu">
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden bg-[#050a14]/95 backdrop-blur-md border-t border-white/10 px-4 pb-6">
+        <div className="lg:hidden bg-white border-t border-gray-100 px-4 pb-4 shadow-lg">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block py-3 text-slate-300 hover:text-blue-400 text-sm border-b border-white/5 transition-colors"
+              className="block py-3 text-gray-600 hover:text-orange-500 text-sm border-b border-gray-50 transition-colors"
             >
               {l.label}
             </Link>
@@ -87,7 +81,7 @@ export default function Navbar() {
           <Link
             href="/join"
             onClick={() => setOpen(false)}
-            className="mt-4 block text-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition-colors font-medium"
+            className="mt-3 block text-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded-lg font-semibold"
           >
             Join Club
           </Link>

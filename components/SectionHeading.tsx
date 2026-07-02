@@ -9,13 +9,13 @@ export default function SectionHeading({ tag, title, subtitle, center = true }: 
   return (
     <div className={`mb-12 ${center ? "text-center" : ""}`}>
       {tag && (
-        <span className="inline-block px-3 py-1 text-xs font-medium text-blue-400 bg-blue-400/10 border border-blue-400/20 rounded-full mb-4">
+        <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-600 bg-orange-100 border border-orange-200 rounded-full mb-3">
           {tag}
         </span>
       )}
-      <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{title}</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{title}</h2>
       {subtitle && (
-        <p className={`text-slate-400 text-base sm:text-lg max-w-2xl ${center ? "mx-auto" : ""}`}>
+        <p className={`text-gray-500 text-base sm:text-lg max-w-2xl ${center ? "mx-auto" : ""}`}>
           {subtitle}
         </p>
       )}

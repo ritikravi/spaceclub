@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050a14;
-  --foreground: #e2e8f0;
+  --background: #f8f9fa;
+  --foreground: #1a1a2e;
+  --primary: #e8640a;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   background: var(--background);
@@ -16,74 +15,45 @@ body {
   overflow-x: hidden;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #050a14; }
-::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
-
-/* Star field animation */
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
+::-webkit-scrollbar-track { background: #f0f0f0; }
+::-webkit-scrollbar-thumb { background: #e8640a; border-radius: 3px; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  50% { transform: translateY(-12px); }
 }
 
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
-}
+.float-animation { animation: float 6s ease-in-out infinite; }
 
-.star {
-  position: absolute;
-  border-radius: 50%;
-  background: white;
-  animation: twinkle ease-in-out infinite;
-}
-
-.float-animation {
-  animation: float 6s ease-in-out infinite;
-}
-
-.glow-blue {
-  animation: glow 3s ease-in-out infinite;
-}
-
-/* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+  background: linear-gradient(135deg, #e8640a, #f59e0b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-blue {
-  background: linear-gradient(135deg, #38bdf8, #60a5fa);
+  background: linear-gradient(135deg, #e8640a, #f59e0b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glass card */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-.glass-hover {
-  transition: all 0.3s ease;
-}
+.glass-hover { transition: all 0.25s ease; }
 
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(59, 130, 246, 0.4);
-  transform: translateY(-4px);
+  border-color: #e8640a;
+  box-shadow: 0 8px 24px rgba(232,100,10,0.12);
+  transform: translateY(-3px);
 }
+
+.glow-blue { box-shadow: 0 4px 20px rgba(232,100,10,0.35); }
