@@ -24,7 +24,10 @@ router.get("/applications", auth, async (req, res) => {
   try {
     const apps = await Member.find().sort({ createdAt: -1 });
     res.json(apps);
-  } catch { res.status(500).json({ error: "Server error." }); }
+  } catch (err) {
+    console.error("Applications error:", err);
+    res.json([]);
+  }
 });
 
 // PATCH update status of a join application
@@ -51,7 +54,10 @@ router.get("/messages", auth, async (req, res) => {
   try {
     const msgs = await Contact.find().sort({ createdAt: -1 });
     res.json(msgs);
-  } catch { res.status(500).json({ error: "Server error." }); }
+  } catch (err) {
+    console.error("Messages error:", err);
+    res.json([]);
+  }
 });
 
 // PATCH mark message as read
@@ -80,12 +86,15 @@ router.get("/public-members", async (req, res) => {
   } catch { res.status(500).json({ error: "Server error." }); }
 });
 
-// GET all core members
+// GET all core members (admin)
 router.get("/core-members", auth, async (req, res) => {
   try {
     const list = await CoreMember.find().sort({ order: 1, createdAt: 1 });
     res.json(list);
-  } catch { res.status(500).json({ error: "Server error." }); }
+  } catch (err) {
+    console.error("Core members error:", err);
+    res.json([]);
+  }
 });
 
 // POST add core member
@@ -119,7 +128,7 @@ router.delete("/core-members/:id", auth, async (req, res) => {
 // ── STATS ──────────────────────────────────────────────
 router.get("/stats", auth, async (req, res) => {
   try {
-    const [totalApps, pendingApps, approvedApps, totalMessages, unreadMessages, coreMembers] = await Promise.all([
+    const [totalApps, pendingApps, approvedApps, totalMessages, unreadMessages, coreMembers] = await Promise.allSettled([
       Member.countDocuments(),
       Member.countDocuments({ status: "pending" }),
       Member.countDocuments({ status: "approved" }),
@@ -127,8 +136,18 @@ router.get("/stats", auth, async (req, res) => {
       Contact.countDocuments({ read: false }),
       CoreMember.countDocuments(),
     ]);
-    res.json({ totalApps, pendingApps, approvedApps, totalMessages, unreadMessages, coreMembers });
-  } catch { res.status(500).json({ error: "Server error." }); }
+    res.json({
+      totalApps: totalApps.status === "fulfilled" ? totalApps.value : 0,
+      pendingApps: pendingApps.status === "fulfilled" ? pendingApps.value : 0,
+      approvedApps: approvedApps.status === "fulfilled" ? approvedApps.value : 0,
+      totalMessages: totalMessages.status === "fulfilled" ? totalMessages.value : 0,
+      unreadMessages: unreadMessages.status === "fulfilled" ? unreadMessages.value : 0,
+      coreMembers: coreMembers.status === "fulfilled" ? coreMembers.value : 0,
+    });
+  } catch (err) {
+    console.error("Stats error:", err);
+    res.json({ totalApps:0, pendingApps:0, approvedApps:0, totalMessages:0, unreadMessages:0, coreMembers:0 });
+  }
 });
 
 module.exports = router;
