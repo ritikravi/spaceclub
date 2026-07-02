@@ -43,3 +43,16 @@ export const getCoreMembers = () => req("/core-members");
 export const addCoreMember = (data: object) => req("/core-members", "POST", data);
 export const updateCoreMember = (id: string, data: object) => req(`/core-members/${id}`, "PATCH", data);
 export const deleteCoreMember = (id: string) => req(`/core-members/${id}`, "DELETE");
+
+export async function uploadPhoto(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("image", file);
+  const res = await fetch(`${API}/api/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${getToken()}` },
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Upload failed.");
+  return data.url;
+}

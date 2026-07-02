@@ -10,6 +10,7 @@ import {
   getStats, getApplications, updateApplication, deleteApplication,
   getMessages, markMessageRead, deleteMessage,
   getCoreMembers, addCoreMember, updateCoreMember, deleteCoreMember,
+  uploadPhoto,
 } from "@/lib/adminApi";
 
 type Tab = "dashboard" | "applications" | "messages" | "members";
@@ -40,8 +41,23 @@ export default function AdminPage() {
   const [toast, setToast] = useState("");
 
   const [backendError, setBackendError] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadPhoto(file);
+      setForm((f: any) => ({ ...f, photo: url }));
+      showToast("Photo uploaded!");
+    } catch {
+      showToast("Upload failed. Try again.");
+    }
+    setUploading(false);
+  };
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -335,7 +351,6 @@ export default function AdminPage() {
                         {label:"Full Name *",key:"name",ph:"e.g. Arjun Sharma",type:"text"},
                         {label:"Email",key:"email",ph:"member@lpu.in",type:"email"},
                         {label:"Year / Designation",key:"year",ph:"2nd Year / Faculty",type:"text"},
-                        {label:"Photo URL",key:"photo",ph:"https://... or leave blank",type:"text"},
                         {label:"LinkedIn URL",key:"linkedin",ph:"https://linkedin.com/in/...",type:"text"},
                         {label:"GitHub URL",key:"github",ph:"https://github.com/...",type:"text"},
                       ].map(({label,key,ph,type})=>(
@@ -356,6 +371,23 @@ export default function AdminPage() {
                           </select>
                         </div>
                       ))}
+                      {/* Photo upload */}
+                      <div className="sm:col-span-2 lg:col-span-3">
+                        <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Profile Photo</label>
+                        <div className="flex items-center gap-4">
+                          {form.photo && (
+                            <img src={form.photo} alt="preview" className="w-14 h-14 rounded-full object-cover border-2 border-blue-400/40" />
+                          )}
+                          <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all border ${uploading ? "opacity-50" : "hover:border-blue-400"}`}
+                            style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>
+                            {uploading ? "Uploading..." : "📷 Upload Photo"}
+                            <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+                          </label>
+                          {form.photo && (
+                            <button onClick={()=>setForm({...form,photo:""})} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <div className="flex gap-3">
                       <button onClick={saveMember} className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all"><Save size={14}/> Save</button>
