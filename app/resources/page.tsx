@@ -43,18 +43,18 @@ const typeColors: Record<string, string> = {
   Course: "text-green-600 bg-green-100",
   Docs: "text-purple-600 bg-purple-100",
   Tool: "text-cyan-600 bg-cyan-100",
-  Guide: "text-orange-600 bg-orange-100",
+  Guide: "text-blue-700 bg-blue-50",
   Template: "text-pink-600 bg-pink-100",
 };
 
 export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Resources</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Resources</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Everything You Need to Learn</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Curated study material, roadmaps, and tools for every level and every division.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Curated study material, roadmaps, and tools for every level and every division.</p>
         </div>
       </section>
 
@@ -94,7 +94,7 @@ export default function ResourcesPage() {
                         <span className={`shrink-0 text-xs px-2 py-0.5 rounded font-semibold ${typeColors[item.type] || "text-gray-500 bg-gray-100"}`}>{item.type}</span>
                         <span className="text-gray-600 text-sm truncate">{item.title}</span>
                       </div>
-                      <a href={item.link} aria-label={`Open ${item.title}`} className="shrink-0 text-gray-400 hover:text-orange-500 transition-colors">
+                      <a href={item.link} aria-label={`Open ${item.title}`} className="shrink-0 text-gray-400 hover:text-blue-700 transition-colors">
                         <ExternalLink size={14} />
                       </a>
                     </li>
@@ -108,7 +108,7 @@ export default function ResourcesPage() {
 
       <section className="py-16 max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <p className="text-gray-400 mb-4">Want to contribute a resource to the library?</p>
-        <Link href="/contact" className="inline-flex items-center gap-2 text-orange-500 hover:text-orange-600 font-semibold text-sm transition-colors">
+        <Link href="/contact" className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-700 font-semibold text-sm transition-colors">
           Submit a resource <ArrowRight size={16} />
         </Link>
       </section>

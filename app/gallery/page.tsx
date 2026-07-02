@@ -15,11 +15,11 @@ const photos = [
 export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Gallery</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Gallery</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Moments We've Captured</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Events, missions, observations, and everything in between.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Events, missions, observations, and everything in between.</p>
         </div>
       </section>
 
@@ -27,7 +27,7 @@ export default function GalleryPage() {
         <div className="flex flex-wrap gap-2 mb-10 justify-center">
           {categories.map((c) => (
             <button key={c}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${c === "All" ? "bg-orange-500 text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${c === "All" ? "bg-blue-700 text-white shadow-sm" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
               {c}
             </button>
           ))}

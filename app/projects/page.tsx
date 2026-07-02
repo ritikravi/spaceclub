@@ -13,11 +13,11 @@ const projects = [
 export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Projects</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Projects</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Real Projects, Real Impact</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Every project here is student-built. Mentored by industry professionals and researchers.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Every project here is student-built. Mentored by industry professionals and researchers.</p>
         </div>
       </section>
 
@@ -45,7 +45,7 @@ export default function ProjectsPage() {
               <p className="text-gray-500 text-sm leading-relaxed mb-4">{p.description}</p>
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {p.tech.map((t) => (
-                  <span key={t} className="px-2 py-0.5 bg-orange-50 border border-orange-200 text-orange-600 text-xs rounded font-medium">{t}</span>
+                  <span key={t} className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs rounded font-medium">{t}</span>
                 ))}
               </div>
               <div className="space-y-1 mb-4">

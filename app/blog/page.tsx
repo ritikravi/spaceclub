@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 
 const posts = [
-  { slug: "how-cubesats-work", title: "How CubeSats Work — A Student's Guide", excerpt: "CubeSats have democratized space access. Here's a complete breakdown of how a 1U CubeSat is designed, from power to comms to payload.", author: "Kiran Das", role: "Technical Lead", date: "Dec 20, 2024", readTime: "8 min", category: "Aerospace", categoryColor: "text-orange-600 bg-orange-100", featured: true },
+  { slug: "how-cubesats-work", title: "How CubeSats Work — A Student's Guide", excerpt: "CubeSats have democratized space access. Here's a complete breakdown of how a 1U CubeSat is designed, from power to comms to payload.", author: "Kiran Das", role: "Technical Lead", date: "Dec 20, 2024", readTime: "8 min", category: "Aerospace", categoryColor: "text-blue-700 bg-blue-50", featured: true },
   { slug: "isro-space-apps-prep", title: "How We Prepared for NASA Space Apps — and Reached Global Top 40", excerpt: "Our team's full story: the sleepless nights, the pivot moments, and the strategy that got us shortlisted globally.", author: "Aditya Sharma", role: "President", date: "Dec 10, 2024", readTime: "10 min", category: "Hackathon", categoryColor: "text-yellow-600 bg-yellow-100", featured: true },
   { slug: "gee-beginners-guide", title: "Getting Started with Google Earth Engine for Beginners", excerpt: "A practical intro to using GEE for satellite data analysis — from NDVI to flood mapping. No prior GIS experience needed.", author: "Ananya Menon", role: "Research Lead", date: "Dec 1, 2024", readTime: "7 min", category: "AI & GIS", categoryColor: "text-purple-600 bg-purple-100", featured: false },
   { slug: "astronomy-photography-basics", title: "Astrophotography on a Budget — What Works", excerpt: "You don't need a ₹50,000 setup to photograph the Milky Way. Here's what we use and how to get started.", author: "Sneha Thomas", role: "Astronomy Division", date: "Nov 22, 2024", readTime: "6 min", category: "Astronomy", categoryColor: "text-blue-600 bg-blue-100", featured: false },
@@ -17,21 +17,21 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Blog</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Blog</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Stories, Guides & Insights</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Written by members. Technical articles, mission recaps, and career guidance.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Written by members. Technical articles, mission recaps, and career guidance.</p>
         </div>
       </section>
 
       <section className="py-12 pb-24 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {featured.map((post) => (
-            <article key={post.slug} className="glass glass-hover rounded-2xl p-8 border-t-4 border-orange-400">
+            <article key={post.slug} className="glass glass-hover rounded-2xl p-8 border-t-4 border-blue-400">
               <div className="flex items-center gap-2 mb-4">
                 <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${post.categoryColor}`}>{post.category}</span>
-                <span className="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-semibold">Featured</span>
+                <span className="text-xs text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full font-semibold">Featured</span>
               </div>
               <h2 className="text-gray-900 font-bold text-xl mb-3 leading-snug">{post.title}</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-6">{post.excerpt}</p>
@@ -51,7 +51,7 @@ export default function BlogPage() {
                 </div>
               </div>
               <div className="mt-5 pt-4 border-t border-gray-100">
-                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-orange-500 hover:text-orange-600 text-sm font-semibold transition-colors">
+                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-blue-700 hover:text-blue-700 text-sm font-semibold transition-colors">
                   Read article <ArrowRight size={14} />
                 </Link>
               </div>
@@ -74,7 +74,7 @@ export default function BlogPage() {
                 <div className="flex items-center gap-2 text-gray-400 text-xs mb-3 justify-end">
                   <Calendar size={10} /> {post.date} · {post.readTime}
                 </div>
-                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-orange-500 hover:text-orange-600 text-sm font-semibold transition-colors">
+                <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-blue-700 hover:text-blue-700 text-sm font-semibold transition-colors">
                   Read <ArrowRight size={14} />
                 </Link>
               </div>

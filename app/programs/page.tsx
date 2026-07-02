@@ -9,18 +9,18 @@ const programs = [
   { icon: BookOpen, title: "Research Cell", badge: "Research", badgeColor: "text-pink-600 bg-pink-100", color: "text-pink-600", bg: "bg-pink-50", description: "Guided program for students interested in academic research. Learn to read, write, and publish papers with IIT mentors.", highlights: ["Paper reading clubs", "Publication guidance", "Patent filing support", "Prototype development", "IIT collaborations"], frequency: "Ongoing" },
   { icon: Building2, title: "Industry Visits", badge: "Exposure", badgeColor: "text-blue-600 bg-blue-100", color: "text-blue-600", bg: "bg-blue-50", description: "Supervised visits to ISRO, IN-SPACe, space startups, and research labs. Special occasion participation included.", highlights: ["ISRO Thiruvananthapuram", "IN-SPACe facilities", "Space startup offices", "Research lab tours", "Expert interaction"], frequency: "2–3 times per year" },
   { icon: Monitor, title: "Weekly Webinars", badge: "Online", badgeColor: "text-cyan-600 bg-cyan-100", color: "text-cyan-600", bg: "bg-cyan-50", description: "Weekly online sessions with national and international professionals nurturing passion for space sciences.", highlights: ["ISRO scientists", "International researchers", "Space startup founders", "IIT professors", "NASA collaborators"], frequency: "Every week" },
-  { icon: GraduationCap, title: "Classroom Learning", badge: "Academic", badgeColor: "text-orange-600 bg-orange-100", color: "text-orange-600", bg: "bg-orange-50", description: "Structured lectures by experts from premier institutions. Live interactions with veterans in space science.", highlights: ["Orbital mechanics basics", "Satellite design fundamentals", "Space law & policy", "Embedded for space", "Python for space data"], frequency: "Bi-weekly" },
+  { icon: GraduationCap, title: "Classroom Learning", badge: "Academic", badgeColor: "text-blue-700 bg-blue-50", color: "text-blue-700", bg: "bg-blue-50", description: "Structured lectures by experts from premier institutions. Live interactions with veterans in space science.", highlights: ["Orbital mechanics basics", "Satellite design fundamentals", "Space law & policy", "Embedded for space", "Python for space data"], frequency: "Bi-weekly" },
   { icon: Lightbulb, title: "Space Startup Cell", badge: "Innovation", badgeColor: "text-rose-600 bg-rose-100", color: "text-rose-600", bg: "bg-rose-50", description: "For students with entrepreneurial ambitions — validate ideas, build pitch decks, understand the space economy.", highlights: ["Startup ideation", "Pitch deck building", "Space market analysis", "Funding guidance", "Mentor network"], frequency: "Monthly sessions" },
 ];
 
 export default function ProgramsPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Programs</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Programs</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Programs Built for Real Growth</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Every program is designed to give students real experience — not just theory.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Every program is designed to give students real experience — not just theory.</p>
         </div>
       </section>
 
@@ -41,14 +41,14 @@ export default function ProgramsPage() {
                 <ul className="space-y-1">
                   {p.highlights.map((h) => (
                     <li key={h} className="flex items-center gap-2 text-gray-600 text-sm">
-                      <span className="text-orange-500 text-xs">✓</span> {h}
+                      <span className="text-blue-700 text-xs">✓</span> {h}
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="flex items-center justify-between border-t border-gray-100 pt-4">
                 <span className="text-xs text-gray-400">🕐 {p.frequency}</span>
-                <Link href="/join" className="text-orange-500 hover:text-orange-600 text-xs font-semibold transition-colors">
+                <Link href="/join" className="text-blue-700 hover:text-blue-700 text-xs font-semibold transition-colors">
                   Register interest →
                 </Link>
               </div>

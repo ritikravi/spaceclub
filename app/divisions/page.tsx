@@ -4,7 +4,7 @@ import Link from "next/link";
 const divisions = [
   {
     emoji: "🚀", name: "Aerospace Division", tagline: "Build what flies",
-    border: "border-orange-200", badge: "text-orange-600 bg-orange-100",
+    border: "border-blue-200", badge: "text-blue-700 bg-blue-50",
     skills: ["CubeSat Design", "CanSat Missions", "Rocketry", "Orbital Mechanics", "Mission Planning", "Payload Design"],
     description: "Design, build, and launch real aerospace systems. From CanSat competitions to CubeSat missions, this is where hardware meets space.",
     projects: ["CanSat 2024 — Atmospheric Analysis", "Ground Station Antenna Tracker", "Orbital Simulation Tool"],
@@ -63,11 +63,11 @@ const divisions = [
 export default function DivisionsPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
-      <section className="bg-orange-500 py-20">
+      <section className="bg-blue-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-200 bg-white/20 rounded-full mb-4">Divisions</span>
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-200 bg-white/10 rounded-full mb-4">Divisions</span>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">Find Your Specialty</h1>
-          <p className="text-orange-100 text-lg max-w-xl mx-auto">Eight specialized teams. Each one builds, researches, and creates real things.</p>
+          <p className="text-blue-100 text-lg max-w-xl mx-auto">Eight specialized teams. Each one builds, researches, and creates real things.</p>
         </div>
       </section>
 
@@ -94,11 +94,11 @@ export default function DivisionsPage() {
                 <ul className="space-y-2">
                   {d.projects.map((p) => (
                     <li key={p} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className="text-orange-500 mt-0.5">→</span> {p}
+                      <span className="text-blue-700 mt-0.5">→</span> {p}
                     </li>
                   ))}
                 </ul>
-                <Link href="/join" className="mt-5 inline-block px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition-all">
+                <Link href="/join" className="mt-5 inline-block px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg transition-all">
                   Join this division →
                 </Link>
               </div>

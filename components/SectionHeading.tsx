@@ -9,7 +9,7 @@ export default function SectionHeading({ tag, title, subtitle, center = true }: 
   return (
     <div className={`mb-12 ${center ? "text-center" : ""}`}>
       {tag && (
-        <span className="inline-block px-3 py-1 text-xs font-semibold text-orange-600 bg-orange-100 border border-orange-200 rounded-full mb-3">
+        <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 rounded-full mb-3">
           {tag}
         </span>
       )}
