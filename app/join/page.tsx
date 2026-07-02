@@ -2,6 +2,7 @@
 import { useState } from "react";
 import StarField from "@/components/StarField";
 import { CheckCircle, Rocket, Star, Crown } from "lucide-react";
+import { submitJoinForm } from "@/lib/api";
 
 const tiers = [
   {
@@ -69,13 +70,24 @@ const years = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PG / PhD"];
 
 export default function JoinPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: "", email: "", phone: "", year: "", branch: "", division: "", why: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+    try {
+      await submitJoinForm(form);
+      setSubmitted(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -226,10 +238,12 @@ export default function JoinPage() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all text-sm"
+                disabled={loading}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all text-sm"
               >
-                Submit Application 🚀
+                {loading ? "Submitting..." : "Submit Application 🚀"}
               </button>
+              {error && <p className="text-red-400 text-sm text-center">{error}</p>}
             </form>
           )}
         </div>

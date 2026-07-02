@@ -2,6 +2,7 @@
 import { useState } from "react";
 import StarField from "@/components/StarField";
 import { Mail, MapPin, GitBranch, Camera, Link2, MessageCircle, Send } from "lucide-react";
+import { submitContactForm } from "@/lib/api";
 
 const contacts = [
   { icon: Mail, label: "Email", value: "spaceclub@college.edu", href: "mailto:spaceclub@college.edu" },
@@ -14,11 +15,22 @@ const contacts = [
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError("");
+    try {
+      await submitContactForm(form);
+      setSent(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -123,10 +135,12 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all text-sm"
+                  disabled={loading}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all text-sm"
                 >
-                  <Send size={16} /> Send Message
+                  <Send size={16} /> {loading ? "Sending..." : "Send Message"}
                 </button>
+                {error && <p className="text-red-400 text-sm">{error}</p>}
               </form>
             )}
           </div>
