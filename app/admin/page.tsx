@@ -43,7 +43,14 @@ export default function AdminPage() {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
-  useEffect(() => { if (isLoggedIn()) { setAuthed(true); } }, []);
+  useEffect(() => {
+    if (isLoggedIn()) {
+      // verify token is still valid
+      getStats()
+        .then(() => setAuthed(true))
+        .catch(() => { adminLogout(); setAuthed(false); });
+    }
+  }, []);
 
   const load = useCallback(async (t: Tab) => {
     setLoading(true);

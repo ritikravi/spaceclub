@@ -6,7 +6,12 @@ const cors = require("cors");
 const app = express();
 
 // Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options("*", cors());
 app.use(express.json());
 
 // DB connect
