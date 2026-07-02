@@ -9,13 +9,13 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="py-16 bg-[#050a14] border-y border-white/5">
+    <section className="py-16 border-y border-[var(--border)]" style={{ background: "var(--bg)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
               <div className="text-3xl font-extrabold gradient-text-blue mb-1">{s.value}</div>
-              <div className="text-slate-400 text-sm">{s.label}</div>
+              <div className="text-sm" style={{ color: "var(--text-muted)" }}>{s.label}</div>
             </div>
           ))}
         </div>

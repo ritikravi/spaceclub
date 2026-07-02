@@ -13,9 +13,9 @@ export default function SectionHeading({ tag, title, subtitle, center = true }: 
           {tag}
         </span>
       )}
-      <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{title}</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--text)" }}>{title}</h2>
       {subtitle && (
-        <p className={`text-slate-400 text-base sm:text-lg max-w-2xl ${center ? "mx-auto" : ""}`}>
+        <p className={`text-base sm:text-lg max-w-2xl ${center ? "mx-auto" : ""}`} style={{ color: "var(--text-muted)" }}>
           {subtitle}
         </p>
       )}
