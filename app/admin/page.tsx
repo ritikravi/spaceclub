@@ -39,6 +39,10 @@ export default function AdminPage() {
   const [search, setSearch] = useState("");
   const [filterDiv, setFilterDiv] = useState("All");
   const [toast, setToast] = useState("");
+  const [notifyModal, setNotifyModal] = useState<{email: string; name: string} | null>(null);
+  const [notifyMsg, setNotifyMsg] = useState("");
+  const [notifyType, setNotifyType] = useState("info");
+  const [notifySending, setNotifySending] = useState(false);
 
   const [backendError, setBackendError] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -109,24 +113,25 @@ export default function AdminPage() {
     try { await updateApplication(id, status); setApplications(a => a.map(x => x._id===id ? {...x,status} : x)); showToast(`Marked as ${status}`); }
     catch {}
   };
-  const sendNotificationToStudent = async (email: string) => {
-    const message = prompt(`Enter notification message for ${email}:`);
-    if (!message) return;
+  const sendNotificationToStudent = (email: string, name: string) => {
+    setNotifyMsg("");
+    setNotifyType("info");
+    setNotifyModal({ email, name });
+  };
+  const submitNotification = async () => {
+    if (!notifyMsg.trim() || !notifyModal) return;
+    setNotifySending(true);
     try {
       const token = localStorage.getItem("admin_token");
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://spaceclub.onrender.com"}/api/student/notify`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://spaceclub.onrender.com"}/api/student/notify`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ email, message, type: "info" }),
+        body: JSON.stringify({ email: notifyModal.email, message: notifyMsg, type: notifyType }),
       });
-      if (response.ok) {
-        showToast(`Notification sent to ${email}`);
-      } else {
-        showToast("Failed to send notification");
-      }
-    } catch {
-      showToast("Failed to send notification");
-    }
+      if (res.ok) { showToast(`Notification sent to ${notifyModal.name || notifyModal.email}`); setNotifyModal(null); }
+      else showToast("Failed to send notification");
+    } catch { showToast("Failed to send notification"); }
+    setNotifySending(false);
   };
   const delApp = async (id: string) => {
     if (!confirm("Delete this application?")) return;
@@ -312,7 +317,7 @@ export default function AdminPage() {
                       <div className="flex gap-2 shrink-0">
                         <button onClick={()=>updateStatus(app._id,"approved")} className="flex items-center gap-1 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs font-semibold rounded-lg transition-all"><Check size={12}/> Approve</button>
                         <button onClick={()=>updateStatus(app._id,"rejected")} className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg transition-all"><X size={12}/> Reject</button>
-                        <button onClick={()=>sendNotificationToStudent(app.email)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-lg transition-all"><MessageSquare size={12}/> Notify</button>
+                        <button onClick={()=>sendNotificationToStudent(app.email, app.name)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-lg transition-all"><MessageSquare size={12}/> Notify</button>
                         <button onClick={()=>delApp(app._id)} className="w-8 h-8 flex items-center justify-center rounded-lg transition-all hover:text-red-400" style={{background:"var(--bg-alt)",color:"var(--text-muted)"}}><Trash2 size={13}/></button>
                       </div>
                     </div>
@@ -463,6 +468,62 @@ export default function AdminPage() {
           </main>
         </div>
       </div>
+
+      {/* ── NOTIFY MODAL ── */}
+      {notifyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={()=>setNotifyModal(null)}>
+          <div className="glass rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg" style={{color:"var(--text)"}}>Send Notification</h3>
+              <button onClick={()=>setNotifyModal(null)} className="text-slate-400 hover:text-white"><X size={18}/></button>
+            </div>
+            <p className="text-xs mb-4" style={{color:"var(--text-muted)"}}>
+              To: <span className="font-semibold text-blue-400">{notifyModal.name}</span> · {notifyModal.email}
+            </p>
+            <div className="mb-3">
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Type</label>
+              <div className="flex gap-2">
+                {[
+                  {val:"info", label:"📢 Info", cls:"text-blue-400 bg-blue-400/10 border-blue-400/30"},
+                  {val:"success", label:"✅ Success", cls:"text-green-400 bg-green-400/10 border-green-400/30"},
+                  {val:"warning", label:"⚠️ Warning", cls:"text-yellow-400 bg-yellow-400/10 border-yellow-400/30"},
+                  {val:"error", label:"❌ Alert", cls:"text-red-400 bg-red-400/10 border-red-400/30"},
+                ].map(t=>(
+                  <button key={t.val} onClick={()=>setNotifyType(t.val)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-all ${notifyType===t.val ? t.cls : "border-white/10 text-slate-400"}`}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Message</label>
+              <textarea
+                rows={4}
+                value={notifyMsg}
+                onChange={e=>setNotifyMsg(e.target.value)}
+                placeholder="Write your message to the student..."
+                className="w-full px-3 py-2.5 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-400 transition-all"
+                style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text)"}}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={submitNotification}
+                disabled={!notifyMsg.trim() || notifySending}
+                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <MessageSquare size={14}/> {notifySending ? "Sending..." : "Send Notification"}
+              </button>
+              <button onClick={()=>setNotifyModal(null)}
+                className="px-4 py-2.5 text-sm rounded-xl transition-all"
+                style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
