@@ -27,7 +27,7 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/upload", require("./routes/upload"));
 
 // Health check
-app.get("/", (req, res) => res.json({ status: "Space Club API running 🚀" }));
+app.get("/", (req, res) => res.json({ status: "Space Club API running 🚀", version: "1.1.0" }));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
