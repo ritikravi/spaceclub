@@ -30,28 +30,17 @@ export default function Hero() {
 
         {/* LPU Official Header */}
         <div className="mb-8">
-          <div className="inline-flex flex-col items-center gap-2">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="text-4xl">🚀</div>
+          <div className="inline-flex flex-col items-center gap-3">
+            <div className="flex items-center gap-4">
+              <div className="text-6xl sm:text-7xl">🚀</div>
               <div className="text-left">
-                <div className="text-2xl sm:text-3xl font-black tracking-tight" style={{ color: "var(--text)" }}>
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight" style={{ color: "var(--text)" }}>
                   LPU <span className="text-blue-400">Space Club</span>
                 </div>
-                <div className="text-sm font-semibold tracking-widest uppercase text-blue-400/70">
+                <div className="text-base sm:text-lg font-semibold tracking-widest uppercase mt-1" style={{ color: "var(--text-muted)" }}>
                   Lovely Professional University
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-green-400/10 border border-green-400/30 text-green-400">
-                ✅ Official Student Club
-              </span>
-              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-400/10 border border-blue-400/30 text-blue-400">
-                📍 Phagwara, Punjab
-              </span>
-              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-purple-400/10 border border-purple-400/30 text-purple-400">
-                🛰️ Space Innovators
-              </span>
             </div>
           </div>
         </div>
