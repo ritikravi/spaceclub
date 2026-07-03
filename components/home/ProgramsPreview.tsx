@@ -14,7 +14,7 @@ const programs = [
 export default function ProgramsPreview() {
   return (
     <section className="py-24 section-bg-alt">
-      <div className="w-full px-6 lg:px-12">
+      <div className="max-w-screen-xl mx-auto px-6 sm:px-10">
         <SectionHeading tag="Programs" title="Programs Built for Real Growth" subtitle="Not just lectures — actual experiences that shape your career path." />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {programs.map((p) => (

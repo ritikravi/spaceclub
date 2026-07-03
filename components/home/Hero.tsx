@@ -26,7 +26,7 @@ export default function Hero() {
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 w-full px-6 lg:px-12 text-center pt-24 pb-16">
+      <div className="relative z-10 max-w-screen-xl mx-auto px-6 sm:px-10 text-center pt-24 pb-16">
 
         {/* LPU Official Header */}
         <div className="mb-8">

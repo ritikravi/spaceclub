@@ -11,7 +11,7 @@ const events = [
 export default function UpcomingEvents() {
   return (
     <section className="py-24 section-bg">
-      <div className="w-full px-6 lg:px-12">
+      <div className="max-w-screen-xl mx-auto px-6 sm:px-10">
         <SectionHeading tag="Events" title="What's Coming Up" subtitle="Stay in the loop. Join us for workshops, observations, hackathons, and more." />
         <div className="space-y-4 mb-10">
           {events.map((ev) => (
