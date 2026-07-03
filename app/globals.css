@@ -22,7 +22,7 @@
   --text-faint: #94a3b8;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: var(--bg);
@@ -94,6 +94,20 @@ html { scroll-behavior: smooth; }
 
 .dark .glass-hover:hover { background: rgba(255,255,255,0.06); box-shadow: 0 8px 24px rgba(59,130,246,0.1); }
 .light .glass-hover:hover { box-shadow: 0 8px 24px rgba(59,130,246,0.12); }
+
+/* Full width container */
+.full-section {
+  width: 100%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 1280px) {
+  .full-section {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
 
 .section-bg { background: var(--bg); }
 .section-bg-alt { background: var(--bg-alt); }

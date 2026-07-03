@@ -32,7 +32,7 @@ export default function Navbar() {
         ? "bg-[var(--bg)]/90 backdrop-blur-md border-b border-[var(--border)] shadow-lg"
         : "bg-transparent"
     }`}>
-      <div className="max-w-screen-xl mx-auto px-6 sm:px-10 py-4 flex items-center justify-between">
+      <div className="w-full px-6 lg:px-12 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400/50 flex items-center justify-center">
