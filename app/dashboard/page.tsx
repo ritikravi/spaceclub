@@ -151,6 +151,90 @@ export default function DashboardPage() {
             {/* OVERVIEW */}
             {!loading && tab === "overview" && profile && (
               <div className="space-y-5">
+                {/* IMPORTANT MESSAGES BOX - shows key notifications */}
+                {(profile.applicationStatus === "approved" || profile.applicationStatus === "rejected" || profile.notifications?.some((n: any) => n.type === "success" || n.type === "warning")) && (
+                  <div className={`glass rounded-2xl p-6 border-l-4 ${profile.applicationStatus === "approved" ? "border-green-400 bg-green-400/5" : profile.applicationStatus === "rejected" ? "border-red-400 bg-red-400/5" : "border-blue-400 bg-blue-400/5"}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${profile.applicationStatus === "approved" ? "bg-green-400/20 text-green-400" : profile.applicationStatus === "rejected" ? "bg-red-400/20 text-red-400" : "bg-blue-400/20 text-blue-400"}`}>
+                        {profile.applicationStatus === "approved" ? "✅" : profile.applicationStatus === "rejected" ? "❌" : "📢"}
+                      </div>
+                      <h2 className="font-bold text-lg" style={{ color: "var(--text)" }}>Important Messages</h2>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {/* Application status message */}
+                      {profile.applicationStatus === "approved" && (
+                        <div className="bg-green-400/10 border border-green-400/20 rounded-xl p-4">
+                          <div className="flex items-start gap-2">
+                            <div className="text-green-400 mt-0.5">✅</div>
+                            <div>
+                              <div className="font-semibold text-green-400 text-sm">🎉 Welcome to LPU Space Club!</div>
+                              <div className="text-slate-300 text-xs mt-1">Your application has been approved. You're now an official member!</div>
+                              <div className="flex items-center gap-2 mt-2 text-xs">
+                                <span className="text-green-400">+50 points awarded</span>
+                                <span className="text-slate-500">•</span>
+                                <span className="text-blue-400 hover:text-blue-300 cursor-pointer" onClick={() => setTab("notifications")}>View all notifications →</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {profile.applicationStatus === "rejected" && (
+                        <div className="bg-red-400/10 border border-red-400/20 rounded-xl p-4">
+                          <div className="flex items-start gap-2">
+                            <div className="text-red-400 mt-0.5">❌</div>
+                            <div>
+                              <div className="font-semibold text-red-400 text-sm">Application Update</div>
+                              <div className="text-slate-300 text-xs mt-1">Your application wasn't approved this time. You can reapply next semester.</div>
+                              <div className="mt-2">
+                                <a href="/join" className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 text-xs">
+                                  Reapply next semester →
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Show recent important notifications (success/warning) */}
+                      {profile.notifications?.filter((n: any) => n.type === "success" || n.type === "warning").slice(0, 2).map((n: any, i: number) => (
+                        <div key={i} className={`rounded-xl p-4 ${n.type === "success" ? "bg-green-400/10 border border-green-400/20" : "bg-yellow-400/10 border border-yellow-400/20"}`}>
+                          <div className="flex items-start gap-2">
+                            <div className={`mt-0.5 ${n.type === "success" ? "text-green-400" : "text-yellow-400"}`}>
+                              {n.type === "success" ? "✅" : "⚠️"}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm" style={{ color: "var(--text)" }}>{n.message}</div>
+                              <div className="text-slate-400 text-xs mt-1">
+                                {new Date(n.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {profile.notifications?.length === 0 && profile.applicationStatus === "pending" && (
+                        <div className="bg-blue-400/10 border border-blue-400/20 rounded-xl p-4">
+                          <div className="flex items-start gap-2">
+                            <div className="text-blue-400 mt-0.5">⏳</div>
+                            <div>
+                              <div className="font-semibold text-blue-400 text-sm">Application Under Review</div>
+                              <div className="text-slate-300 text-xs mt-1">Your application is being reviewed by the admin team. We'll notify you once a decision is made.</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {profile.notifications?.length > 2 && (
+                      <button onClick={() => setTab("notifications")} className="mt-4 text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1">
+                        View all {profile.notifications.length} notifications →
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Status card */}
                 <div className={`glass rounded-2xl p-6 border-l-4 ${profile.applicationStatus === "approved" ? "border-green-400" : profile.applicationStatus === "pending" ? "border-yellow-400" : "border-gray-400"}`}>
                   <h2 className="font-bold text-lg mb-1" style={{ color: "var(--text)" }}>Application Status</h2>
@@ -323,20 +407,75 @@ export default function DashboardPage() {
             {/* NOTIFICATIONS */}
             {!loading && tab === "notifications" && profile && (
               <div>
-                <h2 className="font-bold text-xl mb-5" style={{ color: "var(--text)" }}>Notifications</h2>
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="font-bold text-xl" style={{ color: "var(--text)" }}>Notifications</h2>
+                  {profile.notifications?.length > 0 && (
+                    <div className="text-xs text-slate-400">
+                      {profile.notifications.filter((n: any) => !n.read).length} unread • {profile.notifications.length} total
+                    </div>
+                  )}
+                </div>
+                
                 {profile.notifications?.length === 0 ? (
                   <div className="glass rounded-2xl p-10 text-center">
                     <div className="text-4xl mb-3">🔔</div>
                     <p style={{ color: "var(--text-muted)" }}>No notifications yet.</p>
+                    <p className="text-slate-500 text-sm mt-2">Important messages will appear here when your application status changes or when admins send announcements.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {[...profile.notifications].reverse().map((n: any, i: number) => (
-                      <div key={i} className={`glass rounded-2xl p-5 border-l-4 ${n.type === "success" ? "border-green-400" : n.type === "warning" ? "border-yellow-400" : n.type === "error" ? "border-red-400" : "border-blue-400"} ${!n.read ? "ring-1 ring-blue-400/20" : ""}`}>
-                        <div className="text-sm" style={{ color: "var(--text)" }}>{n.message}</div>
-                        <div className="text-xs mt-1" style={{ color: "var(--text-faint)" }}>{new Date(n.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</div>
-                      </div>
-                    ))}
+                    {[...profile.notifications].reverse().map((n: any, i: number) => {
+                      const icon = n.type === "success" ? "✅" : n.type === "warning" ? "⚠️" : n.type === "error" ? "❌" : "📢";
+                      const typeColor = n.type === "success" ? "text-green-400" : n.type === "warning" ? "text-yellow-400" : n.type === "error" ? "text-red-400" : "text-blue-400";
+                      const bgColor = n.type === "success" ? "bg-green-400/10 border-green-400/20" : n.type === "warning" ? "bg-yellow-400/10 border-yellow-400/20" : n.type === "error" ? "bg-red-400/10 border-red-400/20" : "bg-blue-400/10 border-blue-400/20";
+                      
+                      return (
+                        <div key={i} className={`rounded-2xl p-5 border ${bgColor} ${!n.read ? "ring-1 ring-blue-400/30" : ""}`}>
+                          <div className="flex gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg ${typeColor} ${n.type === "success" ? "bg-green-400/20" : n.type === "warning" ? "bg-yellow-400/20" : n.type === "error" ? "bg-red-400/20" : "bg-blue-400/20"}`}>
+                              {icon}
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-sm" style={{ color: "var(--text)" }}>{n.message}</div>
+                              <div className="flex items-center gap-3 mt-2">
+                                <div className="text-xs" style={{ color: "var(--text-faint)" }}>
+                                  {new Date(n.createdAt).toLocaleDateString("en-IN", { 
+                                    day: "numeric", 
+                                    month: "short", 
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                  })}
+                                </div>
+                                {!n.read && (
+                                  <span className="text-xs text-blue-400 font-medium">NEW</span>
+                                )}
+                                {n.type === "success" && (
+                                  <span className="text-xs text-green-400 font-medium">SUCCESS</span>
+                                )}
+                                {n.type === "warning" && (
+                                  <span className="text-xs text-yellow-400 font-medium">WARNING</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                {profile.notifications?.length > 0 && (
+                  <div className="mt-6 text-center">
+                    <button 
+                      onClick={() => markNotificationsRead(profile.email).then(() => {
+                        // Refresh profile to mark as read
+                        getStudentProfile(profile.email).then(setProfile).catch(() => {});
+                      })}
+                      className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Mark all as read →
+                    </button>
                   </div>
                 )}
               </div>

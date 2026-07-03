@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Users, Mail, FileText, LayoutDashboard, Plus, Trash2,
   Edit2, Save, X, LogOut, Check, Eye, RefreshCw, Lock,
-  Link2, GitBranch
+  Link2, GitBranch, MessageSquare
 } from "lucide-react";
 import {
   adminLogin, adminLogout, isLoggedIn,
@@ -109,7 +109,27 @@ export default function AdminPage() {
     try { await updateApplication(id, status); setApplications(a => a.map(x => x._id===id ? {...x,status} : x)); showToast(`Marked as ${status}`); }
     catch {}
   };
+  const sendNotificationToStudent = async (email: string) => {
+    const message = prompt(`Enter notification message for ${email}:`);
+    if (!message) return;
+    try {
+      const token = localStorage.getItem("admin_token");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://spaceclub.onrender.com"}/api/student/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ email, message, type: "info" }),
+      });
+      if (response.ok) {
+        showToast(`Notification sent to ${email}`);
+      } else {
+        showToast("Failed to send notification");
+      }
+    } catch {
+      showToast("Failed to send notification");
+    }
+  };
   const delApp = async (id: string) => {
+    if (!confirm("Delete this application?")) return;
     try { await deleteApplication(id); setApplications(a => a.filter(x => x._id!==id)); showToast("Deleted."); }
     catch {}
   };
@@ -292,6 +312,7 @@ export default function AdminPage() {
                       <div className="flex gap-2 shrink-0">
                         <button onClick={()=>updateStatus(app._id,"approved")} className="flex items-center gap-1 px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs font-semibold rounded-lg transition-all"><Check size={12}/> Approve</button>
                         <button onClick={()=>updateStatus(app._id,"rejected")} className="flex items-center gap-1 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold rounded-lg transition-all"><X size={12}/> Reject</button>
+                        <button onClick={()=>sendNotificationToStudent(app.email)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-lg transition-all"><MessageSquare size={12}/> Notify</button>
                         <button onClick={()=>delApp(app._id)} className="w-8 h-8 flex items-center justify-center rounded-lg transition-all hover:text-red-400" style={{background:"var(--bg-alt)",color:"var(--text-muted)"}}><Trash2 size={13}/></button>
                       </div>
                     </div>

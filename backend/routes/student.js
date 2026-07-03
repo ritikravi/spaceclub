@@ -3,6 +3,7 @@ const router = express.Router();
 const Student = require("../models/Student");
 const Member = require("../models/Member");
 const nodemailer = require("nodemailer");
+const auth = require("../middleware/auth");
 
 // Email transporter
 const transporter = nodemailer.createTransport({
@@ -96,7 +97,7 @@ router.patch("/mark-read", async (req, res) => {
 });
 
 // POST /api/student/notify — admin sends notification to a student
-router.post("/notify", async (req, res) => {
+router.post("/notify", auth, async (req, res) => {
   try {
     const { email, message, type } = req.body;
     const student = await Student.findOne({ email });
