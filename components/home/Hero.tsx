@@ -62,7 +62,7 @@ export default function Hero() {
 
         {/* University affiliation note */}
         <p className="text-xs mb-10 font-medium" style={{ color: "var(--text-faint)" }}>
-          🏛️ Lovely Professional University · School of Aerospace & Space Sciences · Phagwara, Punjab 144411
+          🏛️ Lovely Professional University · Centre for Space Science · Phagwara, Punjab 144411
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
