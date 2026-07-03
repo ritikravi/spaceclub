@@ -14,6 +14,7 @@ const links = [
   { label: "Resources", href: "/resources" },
   { label: "Blog", href: "/blog" },
   { label: "Gallery", href: "/gallery" },
+  { label: "Dashboard", href: "/dashboard" },
 ];
 
 export default function Navbar() {

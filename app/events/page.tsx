@@ -1,11 +1,13 @@
 "use client";
-import { useState } from "react";
-import SectionHeading from "@/components/SectionHeading";
+import { useState, useEffect } from "react";
+import { useSession, signIn } from "next-auth/react";
 import StarField from "@/components/StarField";
-import { Calendar, MapPin, Clock, Users } from "lucide-react";
+import { Calendar, MapPin, Clock, Users, Loader, LogIn } from "lucide-react";
+import { getStudentProfile, registerForEvent } from "@/lib/studentApi";
 
 const events = [
   {
+    id: "event-1",
     title: "Intro to CubeSat Workshop",
     type: "Workshop",
     status: "upcoming",
@@ -18,6 +20,7 @@ const events = [
     badge: "text-blue-400 bg-blue-400/10",
   },
   {
+    id: "event-2",
     title: "Astronomy Night — Saturn Opposition",
     type: "Observation",
     status: "upcoming",
@@ -30,6 +33,7 @@ const events = [
     badge: "text-purple-400 bg-purple-400/10",
   },
   {
+    id: "event-3",
     title: "NASA Space Apps Hackathon Prep",
     type: "Hackathon",
     status: "upcoming",
@@ -42,6 +46,7 @@ const events = [
     badge: "text-orange-400 bg-orange-400/10",
   },
   {
+    id: "event-4",
     title: "Space Careers Webinar",
     type: "Webinar",
     status: "upcoming",
@@ -54,6 +59,7 @@ const events = [
     badge: "text-cyan-400 bg-cyan-400/10",
   },
   {
+    id: "event-5",
     title: "CanSat 2024 Launch Event",
     type: "Mission",
     status: "past",
@@ -66,6 +72,7 @@ const events = [
     badge: "text-green-400 bg-green-400/10",
   },
   {
+    id: "event-6",
     title: "ISRO Visit — Thiruvananthapuram",
     type: "Visit",
     status: "past",
@@ -80,12 +87,60 @@ const events = [
 ];
 
 export default function EventsPage() {
+  const { data: session, status } = useSession();
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
+  const [profile, setProfile] = useState<any>(null);
+  const [registering, setRegistering] = useState<string | null>(null);
+  const [toast, setToast] = useState("");
+  const [studentLoading, setStudentLoading] = useState(true);
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      getStudentProfile(session.user.email, session.user.name || "", session.user.image || "")
+        .then(p => setProfile(p))
+        .catch(() => {})
+        .finally(() => setStudentLoading(false));
+    } else {
+      setStudentLoading(false);
+    }
+  }, [session]);
 
   const filtered = events.filter((e) => filter === "all" ? true : e.status === filter);
 
+  const handleRegister = async (eventId: string, title: string) => {
+    if (!session?.user?.email) {
+      signIn("google", { callbackUrl: "/events" });
+      return;
+    }
+    setRegistering(eventId);
+    try {
+      await registerForEvent(session.user.email, eventId, title);
+      showToast(`✅ Registered for ${title}! +5 points`);
+      // Refresh profile to show updated events
+      const updated = await getStudentProfile(session.user.email);
+      setProfile(updated);
+    } catch (err: any) {
+      if (err.message.includes("Already registered")) {
+        showToast("You're already registered for this event.");
+      } else {
+        showToast("Registration failed. Try again.");
+      }
+    }
+    setRegistering(null);
+  };
+
+  const isRegistered = (eventId: string) => {
+    return profile?.registeredEvents?.some((e: any) => e.eventId === eventId);
+  };
+
+  const isApprovedMember = profile?.applicationStatus === "approved";
+
   return (
     <div className="min-h-screen bg-[#050a14] pt-24">
+      {toast && <div className="fixed top-24 right-4 z-50 px-4 py-2 bg-green-600 text-white text-sm rounded-xl shadow-lg">{toast}</div>}
+
       <section className="relative py-20 overflow-hidden">
         <StarField />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
@@ -98,6 +153,11 @@ export default function EventsPage() {
           <p className="text-slate-400 text-lg max-w-xl mx-auto">
             Workshops, observations, hackathons, visits, and webinars — all year round.
           </p>
+          {!session && (
+            <div className="mt-6">
+              <p className="text-slate-400 text-sm mb-2">Sign in with your Google account to register for events and earn points.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -120,40 +180,97 @@ export default function EventsPage() {
         </div>
 
         <div className="space-y-5">
-          {filtered.map((ev) => (
-            <div
-              key={ev.title}
-              className={`glass rounded-2xl p-6 border-l-4 ${ev.color} glass-hover`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ev.badge}`}>
-                      {ev.type}
-                    </span>
-                    {ev.status === "past" && (
-                      <span className="text-xs px-2 py-0.5 rounded-full text-slate-500 bg-white/5">Past</span>
-                    )}
+          {filtered.map((ev) => {
+            const registered = isRegistered(ev.id);
+            const canRegister = ev.status === "upcoming" && !registered && isApprovedMember;
+            const needsApproval = ev.status === "upcoming" && !registered && session && !isApprovedMember;
+            const needsLogin = ev.status === "upcoming" && !session;
+
+            return (
+              <div
+                key={ev.id}
+                className={`glass rounded-2xl p-6 border-l-4 ${ev.color} glass-hover`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ev.badge}`}>
+                        {ev.type}
+                      </span>
+                      {ev.status === "past" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full text-slate-500 bg-white/5">Past</span>
+                      )}
+                      {registered && (
+                        <span className="text-xs px-2 py-0.5 rounded-full text-green-400 bg-green-400/10 font-semibold">✓ Registered</span>
+                      )}
+                    </div>
+                    <h2 className="text-white font-bold text-lg mb-2">{ev.title}</h2>
+                    <p className="text-slate-400 text-sm mb-4 leading-relaxed">{ev.description}</p>
+                    <div className="flex flex-wrap gap-4 text-slate-400 text-xs">
+                      <span className="flex items-center gap-1"><Calendar size={12} /> {ev.date}</span>
+                      <span className="flex items-center gap-1"><Clock size={12} /> {ev.time}</span>
+                      <span className="flex items-center gap-1"><MapPin size={12} /> {ev.location}</span>
+                      <span className="flex items-center gap-1"><Users size={12} /> {ev.capacity}</span>
+                    </div>
                   </div>
-                  <h2 className="text-white font-bold text-lg mb-2">{ev.title}</h2>
-                  <p className="text-slate-400 text-sm mb-4 leading-relaxed">{ev.description}</p>
-                  <div className="flex flex-wrap gap-4 text-slate-400 text-xs">
-                    <span className="flex items-center gap-1"><Calendar size={12} /> {ev.date}</span>
-                    <span className="flex items-center gap-1"><Clock size={12} /> {ev.time}</span>
-                    <span className="flex items-center gap-1"><MapPin size={12} /> {ev.location}</span>
-                    <span className="flex items-center gap-1"><Users size={12} /> {ev.capacity}</span>
-                  </div>
+                  {ev.status === "upcoming" && (
+                    <div className="shrink-0">
+                      {needsLogin && (
+                        <button
+                          onClick={() => signIn("google", { callbackUrl: "/events" })}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all"
+                        >
+                          <LogIn size={16} /> Sign in to Register
+                        </button>
+                      )}
+                      {needsApproval && (
+                        <div className="text-center">
+                          <button disabled className="px-5 py-2.5 bg-slate-600 text-slate-400 text-sm font-medium rounded-xl">
+                            Awaiting Approval
+                          </button>
+                          <p className="text-xs text-slate-500 mt-1">Your application must be approved first.</p>
+                        </div>
+                      )}
+                      {canRegister && (
+                        <button
+                          onClick={() => handleRegister(ev.id, ev.title)}
+                          disabled={registering === ev.id}
+                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          {registering === ev.id ? (
+                            <>
+                              <Loader size={14} className="animate-spin" /> Registering...
+                            </>
+                          ) : (
+                            "Register Now"
+                          )}
+                        </button>
+                      )}
+                      {registered && (
+                        <div className="text-center">
+                          <button disabled className="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-xl">
+                            ✓ Registered
+                          </button>
+                          <p className="text-xs text-green-400 mt-1">+5 points earned!</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                {ev.status === "upcoming" && (
-                  <div className="shrink-0">
-                    <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all">
-                      Register
-                    </button>
-                  </div>
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+
+        {/* Info box */}
+        <div className="glass rounded-2xl p-6 mt-8 border-l-4 border-blue-400/50">
+          <h3 className="text-white font-semibold mb-2">How Event Registration Works</h3>
+          <ul className="text-slate-400 text-sm space-y-1">
+            <li className="flex items-center gap-2">✅ Sign in with your Google account</li>
+            <li className="flex items-center gap-2">✅ Your application must be approved by the admin</li>
+            <li className="flex items-center gap-2">✅ Register for upcoming events — earn 5 points each</li>
+            <li className="flex items-center gap-2">✅ View your events and points in your <a href="/dashboard" className="text-blue-400 hover:text-blue-300 underline">Dashboard</a></li>
+          </ul>
         </div>
       </section>
     </div>

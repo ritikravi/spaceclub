@@ -25,6 +25,7 @@ app.use("/api/contact", require("./routes/contact"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/upload", require("./routes/upload"));
+app.use("/api/student", require("./routes/student"));
 
 // Health check
 app.get("/", (req, res) => res.json({ status: "Space Club API running 🚀", version: "1.1.0" }));

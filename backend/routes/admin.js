@@ -5,6 +5,19 @@ const auth = require("../middleware/auth");
 const Member = require("../models/Member");
 const Contact = require("../models/Contact");
 const CoreMember = require("../models/CoreMember");
+const Student = require("../models/Student");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: { user: process.env.EMAIL_FROM, pass: process.env.EMAIL_PASS },
+});
+
+async function sendEmail(to, subject, html) {
+  if (!process.env.EMAIL_FROM) return;
+  try { await transporter.sendMail({ from: `"LPU Space Club" <${process.env.EMAIL_FROM}>`, to, subject, html }); }
+  catch (e) { console.error("Email:", e.message); }
+}
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "spaceclub2024";
 const JWT_SECRET = process.env.JWT_SECRET || "spaceclub_secret";
@@ -36,8 +49,47 @@ router.patch("/applications/:id", auth, async (req, res) => {
     const { status } = req.body;
     const app = await Member.findByIdAndUpdate(req.params.id, { status }, { new: true });
     if (!app) return res.status(404).json({ error: "Not found." });
+
+    // Sync to Student + send email
+    const student = await Student.findOne({ email: app.email });
+    if (student) {
+      student.applicationStatus = status;
+      const msg = status === "approved"
+        ? `🎉 Congratulations! Your application to LPU Space Club has been approved. Welcome aboard!`
+        : `Your Space Club application has been reviewed. Unfortunately it was not approved this time. You can reapply next semester.`;
+      student.notifications.push({ message: msg, type: status === "approved" ? "success" : "warning" });
+      if (status === "approved") student.points += 50; // welcome points
+      await student.save();
+    }
+
+    // Send email notification
+    if (status === "approved") {
+      await sendEmail(app.email, "🚀 Welcome to LPU Space Club!", `
+        <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:32px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0">
+          <h2 style="color:#1d4ed8;margin-bottom:8px">Welcome to LPU Space Club! 🚀</h2>
+          <p style="color:#334155;font-size:15px">Hi ${app.name},</p>
+          <p style="color:#334155;font-size:15px">Your application has been <strong style="color:#16a34a">approved</strong>! You are now an official member of LPU Space Club.</p>
+          <p style="color:#64748b;font-size:13px">Division: <strong>${app.division}</strong></p>
+          <a href="https://spaceclub-sigma.vercel.app/dashboard" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#1d4ed8;color:white;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Go to Your Dashboard →</a>
+          <p style="color:#94a3b8;font-size:12px;margin-top:24px">LPU Space Club · Centre for Space Science</p>
+        </div>
+      `);
+    } else if (status === "rejected") {
+      await sendEmail(app.email, "LPU Space Club — Application Update", `
+        <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:32px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0">
+          <h2 style="color:#1d4ed8">LPU Space Club</h2>
+          <p style="color:#334155;font-size:15px">Hi ${app.name}, thank you for applying to LPU Space Club.</p>
+          <p style="color:#334155;font-size:15px">After review, we are unable to approve your application at this time. We encourage you to reapply next semester.</p>
+          <p style="color:#94a3b8;font-size:12px;margin-top:24px">LPU Space Club · Centre for Space Science</p>
+        </div>
+      `);
+    }
+
     res.json(app);
-  } catch { res.status(500).json({ error: "Server error." }); }
+  } catch (err) {
+    console.error("Application update error:", err);
+    res.status(500).json({ error: "Server error." });
+  }
 });
 
 // DELETE a join application
