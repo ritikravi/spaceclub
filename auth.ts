@@ -5,7 +5,7 @@ import Google from "next-auth/providers/google";
 const ADMIN_EMAILS = [
   "ritikravi7724@gmail.com",
   "ritik.raushan20251@lpu.in",
-  // Add more admin emails as needed
+  "ayushpratapsingh@gmail.com",
 ];
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
