@@ -3,17 +3,18 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Users, Mail, FileText, LayoutDashboard, Plus, Trash2,
   Edit2, Save, X, LogOut, Check, Eye, RefreshCw, Lock,
-  Link2, GitBranch, MessageSquare
+  Link2, GitBranch, MessageSquare, Megaphone, Radio
 } from "lucide-react";
 import {
   adminLogin, adminLogout, isLoggedIn,
   getStats, getApplications, updateApplication, deleteApplication,
   getMessages, markMessageRead, deleteMessage,
   getCoreMembers, addCoreMember, updateCoreMember, deleteCoreMember,
-  uploadPhoto,
+  uploadPhoto, getAnnouncements, createAnnouncement, toggleAnnouncement,
+  deleteAnnouncement, broadcastToAll,
 } from "@/lib/adminApi";
 
-type Tab = "dashboard" | "applications" | "messages" | "members";
+type Tab = "dashboard" | "applications" | "messages" | "members" | "announcements";
 
 const divisions = ["Leadership","Aerospace","Robotics","AI & Data","Embedded Systems","Software","Research","Astronomy","Media & Design","Events","Outreach"];
 const roles = ["Faculty Head","Faculty Coordinator","Student Lead","Division Head","Core Member","Member"];
@@ -43,6 +44,14 @@ export default function AdminPage() {
   const [notifyMsg, setNotifyMsg] = useState("");
   const [notifyType, setNotifyType] = useState("info");
   const [notifySending, setNotifySending] = useState(false);
+
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [annForm, setAnnForm] = useState({ title: "", message: "", type: "info" });
+  const [annAdding, setAnnAdding] = useState(false);
+  const [broadcastModal, setBroadcastModal] = useState(false);
+  const [broadcastMsg, setBroadcastMsg] = useState("");
+  const [broadcastType, setBroadcastType] = useState("info");
+  const [broadcastSending, setBroadcastSending] = useState(false);
 
   const [backendError, setBackendError] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -80,6 +89,7 @@ export default function AdminPage() {
       else if (t === "applications") setApplications(await getApplications());
       else if (t === "messages") setMessages(await getMessages());
       else if (t === "members") setMembers(await getCoreMembers());
+      else if (t === "announcements") setAnnouncements(await getAnnouncements());
     } catch (e: any) {
       setBackendError(e.message || "Cannot connect to backend.");
     }
@@ -230,6 +240,7 @@ export default function AdminPage() {
                 {id:"applications",icon:FileText,label:"Applications"},
                 {id:"messages",icon:Mail,label:"Messages"},
                 {id:"members",icon:Users,label:"Core Members"},
+                {id:"announcements",icon:Megaphone,label:"Announcements"},
               ] as {id:Tab,icon:any,label:string}[]).map(item => (
                 <button key={item.id} onClick={()=>switchTab(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-1 transition-all ${tab===item.id ? "bg-blue-600 text-white" : "hover:bg-blue-400/10"}`}
@@ -258,6 +269,7 @@ export default function AdminPage() {
                 {tab==="applications"&&"Join Applications"}
                 {tab==="messages"&&"Contact Messages"}
                 {tab==="members"&&"Core Members"}
+                {tab==="announcements"&&"Announcements & Broadcast"}
               </h1>
               <button onClick={()=>load(tab)} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all hover:text-blue-400" style={{color:"var(--text-muted)",background:"var(--surface)",border:"1px solid var(--border)"}}>
                 <RefreshCw size={12}/> Refresh
@@ -288,7 +300,7 @@ export default function AdminPage() {
                     <button onClick={()=>switchTab("applications")} className="px-4 py-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 text-xs font-semibold rounded-xl transition-all">Review Applications →</button>
                     <button onClick={()=>switchTab("messages")} className="px-4 py-2 bg-purple-400/10 hover:bg-purple-400/20 text-purple-400 text-xs font-semibold rounded-xl transition-all">Read Messages →</button>
                     <button onClick={()=>switchTab("members")} className="px-4 py-2 bg-blue-400/10 hover:bg-blue-400/20 text-blue-400 text-xs font-semibold rounded-xl transition-all">Manage Members →</button>
-                  </div>
+                    <button onClick={()=>{setBroadcastMsg("");setBroadcastType("info");setBroadcastModal(true);}} className="px-4 py-2 bg-orange-400/10 hover:bg-orange-400/20 text-orange-400 text-xs font-semibold rounded-xl transition-all">📢 Broadcast to All →</button>                  </div>
                 </div>
               </div>
             )}
@@ -465,9 +477,139 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+
+            {/* ── ANNOUNCEMENTS ── */}
+            {!loading && tab==="announcements" && (
+              <div className="space-y-5">
+                {/* Broadcast to all */}
+                <div className="glass rounded-2xl p-6 border border-yellow-400/20 bg-yellow-400/5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-bold text-base flex items-center gap-2" style={{color:"var(--text)"}}><Radio size={16} className="text-yellow-400"/> Broadcast to All Members</h3>
+                      <p className="text-xs mt-0.5" style={{color:"var(--text-muted)"}}>Send a notification to every approved member instantly.</p>
+                    </div>
+                    <button onClick={()=>{setBroadcastMsg("");setBroadcastType("info");setBroadcastModal(true);}}
+                      className="flex items-center gap-2 px-4 py-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 text-sm font-semibold rounded-xl transition-all border border-yellow-400/30">
+                      <Radio size={14}/> Broadcast
+                    </button>
+                  </div>
+                </div>
+
+                {/* Create announcement */}
+                <div className="glass rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-base flex items-center gap-2" style={{color:"var(--text)"}}><Megaphone size={16} className="text-blue-400"/> Site Announcements</h3>
+                    <button onClick={()=>setAnnAdding(a=>!a)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 text-sm font-semibold rounded-xl transition-all border border-blue-400/30">
+                      <Plus size={14}/> New
+                    </button>
+                  </div>
+
+                  {annAdding && (
+                    <div className="rounded-xl p-4 mb-4 space-y-3" style={{background:"var(--bg-alt)",border:"1px solid var(--border)"}}>
+                      <input value={annForm.title} onChange={e=>setAnnForm(f=>({...f,title:e.target.value}))} placeholder="Announcement title..."
+                        className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+                      <textarea rows={3} value={annForm.message} onChange={e=>setAnnForm(f=>({...f,message:e.target.value}))} placeholder="Write your announcement..."
+                        className="w-full px-3 py-2.5 rounded-xl text-sm resize-none focus:outline-none" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+                      <div className="flex gap-2">
+                        {["info","success","warning","urgent"].map(t=>(
+                          <button key={t} onClick={()=>setAnnForm(f=>({...f,type:t}))}
+                            className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-all ${annForm.type===t ? "bg-blue-600 text-white border-blue-600" : "border-white/10 text-slate-400"}`}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex gap-3">
+                        <button onClick={async()=>{
+                          if(!annForm.title||!annForm.message) return;
+                          try{const a=await createAnnouncement(annForm);setAnnouncements(l=>[a,...l]);setAnnAdding(false);setAnnForm({title:"",message:"",type:"info"});showToast("Announcement posted!");}
+                          catch{showToast("Failed.");}
+                        }} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all">Post</button>
+                        <button onClick={()=>setAnnAdding(false)} className="px-4 py-2 text-sm rounded-xl transition-all" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>Cancel</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {announcements.length===0 && <div className="text-center py-8" style={{color:"var(--text-faint)"}}>No announcements yet.</div>}
+                  <div className="space-y-3">
+                    {announcements.map(a=>{
+                      const colors: Record<string,string> = {info:"text-blue-400 border-blue-400/30",success:"text-green-400 border-green-400/30",warning:"text-yellow-400 border-yellow-400/30",urgent:"text-red-400 border-red-400/30"};
+                      return (
+                        <div key={a._id} className={`rounded-xl p-4 flex items-start gap-4 border ${colors[a.type]||"text-blue-400 border-blue-400/30"} ${!a.active?"opacity-50":""}`} style={{background:"var(--bg-alt)"}}>
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm" style={{color:"var(--text)"}}>{a.title}</div>
+                            <div className="text-xs mt-1" style={{color:"var(--text-muted)"}}>{a.message}</div>
+                            <div className="flex items-center gap-3 mt-2 text-xs" style={{color:"var(--text-faint)"}}>
+                              <span>{new Date(a.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span>
+                              <span className={`font-semibold ${a.active?"text-green-400":"text-slate-500"}`}>{a.active?"● Live":"● Hidden"}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <button onClick={async()=>{const u=await toggleAnnouncement(a._id,!a.active);setAnnouncements(l=>l.map(x=>x._id===a._id?u:x));showToast(u.active?"Shown":"Hidden");}}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:text-blue-400" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Eye size={13}/></button>
+                            <button onClick={async()=>{await deleteAnnouncement(a._id);setAnnouncements(l=>l.filter(x=>x._id!==a._id));showToast("Deleted.");}}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:text-red-400" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Trash2 size={13}/></button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </main>
         </div>
       </div>
+
+      {/* ── BROADCAST MODAL ── */}
+      {broadcastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={()=>setBroadcastModal(false)}>
+          <div className="glass rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e=>e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg flex items-center gap-2" style={{color:"var(--text)"}}><Radio size={16} className="text-yellow-400"/> Broadcast to All Members</h3>
+              <button onClick={()=>setBroadcastModal(false)} className="text-slate-400 hover:text-white"><X size={18}/></button>
+            </div>
+            <p className="text-xs mb-4 text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-xl px-3 py-2">
+              ⚠️ This will send a notification to ALL approved members at once.
+            </p>
+            <div className="mb-3">
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Type</label>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  {val:"info",label:"📢 Info",cls:"text-blue-400 bg-blue-400/10 border-blue-400/30"},
+                  {val:"success",label:"✅ Success",cls:"text-green-400 bg-green-400/10 border-green-400/30"},
+                  {val:"warning",label:"⚠️ Warning",cls:"text-yellow-400 bg-yellow-400/10 border-yellow-400/30"},
+                  {val:"urgent",label:"🚨 Urgent",cls:"text-red-400 bg-red-400/10 border-red-400/30"},
+                ].map(t=>(
+                  <button key={t.val} onClick={()=>setBroadcastType(t.val)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-all ${broadcastType===t.val?t.cls:"border-white/10 text-slate-400"}`}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Message</label>
+              <textarea rows={4} value={broadcastMsg} onChange={e=>setBroadcastMsg(e.target.value)} placeholder="Write your broadcast message..."
+                className="w-full px-3 py-2.5 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-400 transition-all"
+                style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={async()=>{
+                if(!broadcastMsg.trim()) return;
+                setBroadcastSending(true);
+                try{const r=await broadcastToAll(broadcastMsg,broadcastType);showToast(`Sent to ${r.count} members!`);setBroadcastModal(false);}
+                catch{showToast("Broadcast failed.");}
+                setBroadcastSending(false);
+              }} disabled={!broadcastMsg.trim()||broadcastSending}
+                className="flex-1 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                <Radio size={14}/> {broadcastSending?"Sending...":"Send to All Members"}
+              </button>
+              <button onClick={()=>setBroadcastModal(false)} className="px-4 py-2.5 text-sm rounded-xl transition-all" style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── NOTIFY MODAL ── */}
       {notifyModal && (

@@ -41,3 +41,11 @@ export async function fetchEvents(status?: "upcoming" | "past") {
   if (!res.ok) throw new Error("Failed to fetch events.");
   return res.json();
 }
+
+export async function getPublicAnnouncements() {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/announcements`);
+    if (!res.ok) return [];
+    return res.json();
+  } catch { return []; }
+}

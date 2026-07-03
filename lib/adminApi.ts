@@ -56,3 +56,49 @@ export async function uploadPhoto(file: File): Promise<string> {
   if (!res.ok) throw new Error(data.error || "Upload failed.");
   return data.url;
 }
+
+// ── ANNOUNCEMENTS ──
+export async function getAnnouncements() {
+  const res = await fetch(`${API}/api/admin/announcements/all`, {
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function createAnnouncement(data: { title: string; message: string; type: string }) {
+  const res = await fetch(`${API}/api/admin/announcements`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create announcement.");
+  return res.json();
+}
+
+export async function toggleAnnouncement(id: string, active: boolean) {
+  const res = await fetch(`${API}/api/admin/announcements/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+    body: JSON.stringify({ active }),
+  });
+  if (!res.ok) throw new Error("Failed to update.");
+  return res.json();
+}
+
+export async function deleteAnnouncement(id: string) {
+  await fetch(`${API}/api/admin/announcements/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+}
+
+export async function broadcastToAll(message: string, type: string) {
+  const res = await fetch(`${API}/api/admin/broadcast`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+    body: JSON.stringify({ message, type }),
+  });
+  if (!res.ok) throw new Error("Broadcast failed.");
+  return res.json();
+}

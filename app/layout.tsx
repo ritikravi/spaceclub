@@ -4,10 +4,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SessionProvider from "@/components/SessionProvider";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 
 export const metadata: Metadata = {
-  title: "Space Club | College Space Innovation Hub",
-  description: "Building the next generation of space scientists, engineers, and innovators.",
+  title: "LPU Space Club | Centre for Space Science",
+  description: "Building the next generation of space scientists, engineers, and innovators at Lovely Professional University.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <SessionProvider>
             <Navbar />
+            <AnnouncementBanner />
             <main>{children}</main>
             <Footer />
           </SessionProvider>

@@ -6,6 +6,7 @@ const Member = require("../models/Member");
 const Contact = require("../models/Contact");
 const CoreMember = require("../models/CoreMember");
 const Student = require("../models/Student");
+const Announcement = require("../models/Announcement");
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -199,6 +200,67 @@ router.get("/stats", auth, async (req, res) => {
   } catch (err) {
     console.error("Stats error:", err);
     res.json({ totalApps:0, pendingApps:0, approvedApps:0, totalMessages:0, unreadMessages:0, coreMembers:0 });
+  }
+});
+
+// ── ANNOUNCEMENTS ─────────────────────────────────────
+// GET active announcements (public)
+router.get("/announcements", async (req, res) => {
+  try {
+    const list = await Announcement.find({ active: true }).sort({ createdAt: -1 }).limit(5);
+    res.json(list);
+  } catch { res.json([]); }
+});
+
+// GET all announcements (admin)
+router.get("/announcements/all", auth, async (req, res) => {
+  try {
+    const list = await Announcement.find().sort({ createdAt: -1 });
+    res.json(list);
+  } catch { res.json([]); }
+});
+
+// POST create announcement
+router.post("/announcements", auth, async (req, res) => {
+  try {
+    const { title, message, type } = req.body;
+    if (!title || !message) return res.status(400).json({ error: "Title and message required." });
+    const a = await Announcement.create({ title, message, type });
+    res.status(201).json(a);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// PATCH toggle announcement active
+router.patch("/announcements/:id", auth, async (req, res) => {
+  try {
+    const a = await Announcement.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(a);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// DELETE announcement
+router.delete("/announcements/:id", auth, async (req, res) => {
+  try {
+    await Announcement.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted." });
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// ── BROADCAST ─────────────────────────────────────────
+// POST broadcast notification to ALL approved students
+router.post("/broadcast", auth, async (req, res) => {
+  try {
+    const { message, type } = req.body;
+    if (!message) return res.status(400).json({ error: "Message required." });
+    const students = await Student.find({ applicationStatus: "approved" });
+    for (const s of students) {
+      s.notifications.push({ message, type: type || "info" });
+      await s.save();
+    }
+    res.json({ message: `Broadcast sent to ${students.length} members.`, count: students.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
   }
 });
 
