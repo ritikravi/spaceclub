@@ -135,7 +135,7 @@ export default function Footer() {
     <footer className="border-t" style={{ background: "var(--bg-alt)", borderColor: "var(--border)" }}>
       {/* Team strip */}
       <div className="border-b py-6" style={{ borderColor: "var(--border)" }}>
-        <div className="w-full px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row gap-6 items-start">
 
             {/* Faculty box */}
@@ -172,7 +172,7 @@ export default function Footer() {
 
       {/* Main footer */}
       <div className="pt-12 pb-8">
-        <div className="w-full px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-10">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-4">
