@@ -4,18 +4,23 @@ const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const auth = require("../middleware/auth");
 
+const CLOUD_NAME = (process.env.CLOUDINARY_CLOUD_NAME || "").trim().replace(/\s/g, "");
+const API_KEY = (process.env.CLOUDINARY_API_KEY || "").trim().replace(/\s/g, "");
+const API_SECRET = (process.env.CLOUDINARY_API_SECRET || "").trim().replace(/\s/g, "");
+
 cloudinary.config({
-  cloud_name: (process.env.CLOUDINARY_CLOUD_NAME || "").trim(),
-  api_key: (process.env.CLOUDINARY_API_KEY || "").trim(),
-  api_secret: (process.env.CLOUDINARY_API_SECRET || "").trim(),
+  cloud_name: CLOUD_NAME,
+  api_key: API_KEY,
+  api_secret: API_SECRET,
 });
 
 // Debug — remove after testing
 const router2 = express.Router ? null : null;
 console.log("Cloudinary config:", {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "MISSING",
-  api_key: process.env.CLOUDINARY_API_KEY ? "SET" : "MISSING",
-  api_secret: process.env.CLOUDINARY_API_SECRET ? "SET" : "MISSING",
+  cloud_name: CLOUD_NAME || "MISSING",
+  api_key: API_KEY ? "SET" : "MISSING",
+  api_secret: API_SECRET ? "SET" : "MISSING",
+  secret_len: API_SECRET.length,
 });
 
 // Use memory storage — no disk needed
