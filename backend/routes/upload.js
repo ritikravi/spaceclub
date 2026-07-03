@@ -10,6 +10,14 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Debug — remove after testing
+const router2 = express.Router ? null : null;
+console.log("Cloudinary config:", {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "MISSING",
+  api_key: process.env.CLOUDINARY_API_KEY ? "SET" : "MISSING",
+  api_secret: process.env.CLOUDINARY_API_SECRET ? "SET" : "MISSING",
+});
+
 // Use memory storage — no disk needed
 const upload = multer({
   storage: multer.memoryStorage(),
