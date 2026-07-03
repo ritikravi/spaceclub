@@ -13,7 +13,7 @@ const items = [
 export default function WhatWeDo() {
   return (
     <section className="py-24 section-bg-alt">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="w-full px-6 lg:px-12">
         <SectionHeading tag="What We Do" title="More Than a Club" subtitle="We're a full-stack innovation ecosystem. From learning the basics to competing globally." />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (

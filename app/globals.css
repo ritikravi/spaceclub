@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* ── Dark theme (default) ── */
 :root {
   --bg: #050a14;
   --bg-alt: #060c18;
@@ -12,7 +11,6 @@
   --text-faint: #64748b;
 }
 
-/* ── Light theme ── */
 .light {
   --bg: #f8fafc;
   --bg-alt: #f1f5f9;
@@ -24,14 +22,14 @@
   --text-faint: #94a3b8;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
-  transition: background 0.3s ease, color 0.3s ease;
+  width: 100%;
 }
 
 html { scroll-behavior: smooth; }
@@ -40,7 +38,6 @@ html { scroll-behavior: smooth; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
 
-/* Animations */
 @keyframes twinkle {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
@@ -64,11 +61,9 @@ html { scroll-behavior: smooth; }
 }
 
 .light .star { background: #94a3b8; }
-
 .float-animation { animation: float 6s ease-in-out infinite; }
 .glow-blue { animation: glow 3s ease-in-out infinite; }
 
-/* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
   -webkit-background-clip: text;
@@ -83,17 +78,13 @@ html { scroll-behavior: smooth; }
   background-clip: text;
 }
 
-/* Glass card — adapts to theme */
 .glass {
   background: var(--surface);
   border: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
 
-.light .glass {
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-
+.light .glass { box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
 .glass-hover { transition: all 0.3s ease; }
 
 .glass-hover:hover {
@@ -101,15 +92,22 @@ html { scroll-behavior: smooth; }
   transform: translateY(-4px);
 }
 
-.dark .glass-hover:hover {
-  background: rgba(255,255,255,0.06);
-  box-shadow: 0 8px 24px rgba(59,130,246,0.1);
+.dark .glass-hover:hover { background: rgba(255,255,255,0.06); box-shadow: 0 8px 24px rgba(59,130,246,0.1); }
+.light .glass-hover:hover { box-shadow: 0 8px 24px rgba(59,130,246,0.12); }
+
+/* Full width container */
+.full-section {
+  width: 100%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
-.light .glass-hover:hover {
-  box-shadow: 0 8px 24px rgba(59,130,246,0.12);
+@media (min-width: 1280px) {
+  .full-section {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
 }
 
-/* Section backgrounds */
 .section-bg { background: var(--bg); }
 .section-bg-alt { background: var(--bg-alt); }
