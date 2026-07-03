@@ -1,13 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
-// Add allowed admin emails here
-const ADMIN_EMAILS = [
-  "ritikravi7724@gmail.com",
-  "ritik.raushan20251@lpu.in",
-  "ayushpratapsingh@gmail.com",
-];
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
@@ -16,16 +9,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      // Only allow whitelisted emails
-      return ADMIN_EMAILS.includes(user.email ?? "");
-    },
-    async session({ session, token }) {
-      return session;
+    async signIn() {
+      // Allow ALL Google accounts — for join form verification only
+      return true;
     },
   },
   pages: {
-    signIn: "/admin/login",
-    error: "/admin/login",
+    signIn: "/join",
+    error: "/join",
   },
 });

@@ -106,7 +106,7 @@ export default function JoinPage() {
                 We use Google Sign-In to verify your identity. No fake applications.
               </p>
               <button
-                onClick={() => signIn("google")}
+                onClick={() => signIn("google", { callbackUrl: "/join" })}
                 className="inline-flex items-center justify-center gap-3 px-8 py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl shadow-md transition-all text-sm border border-gray-200 mx-auto"
               >
                 <svg width="18" height="18" viewBox="0 0 48 48">
