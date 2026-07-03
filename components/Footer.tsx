@@ -126,7 +126,7 @@ export default function Footer() {
       .then(data => {
         if (!Array.isArray(data)) return;
         setFaculty(data.filter((m: Member) => m.type === "faculty"));
-        setLeads(data.filter((m: Member) => m.type === "student-lead"));
+        setLeads(data.filter((m: Member) => m.type === "student-lead" || m.type === "core"));
       })
       .catch(() => {}); // silently fall back to defaults
   }, []);

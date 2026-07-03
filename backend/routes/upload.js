@@ -34,9 +34,9 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     });
 
     res.json({ url: result.secure_url });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Upload error:", err);
-    res.status(500).json({ error: "Upload failed." });
+    res.status(500).json({ error: err.message || "Upload failed." });
   }
 });
 
