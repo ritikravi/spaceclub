@@ -61,8 +61,8 @@ export default function Hero() {
         </p>
 
         {/* University affiliation note */}
-        <p className="text-xs mb-10 font-medium" style={{ color: "var(--text-faint)" }}>
-          🏛️ Lovely Professional University · Centre for Space Science · Phagwara, Punjab 144411
+        <p className="text-sm sm:text-base mb-10 font-semibold" style={{ color: "var(--text-muted)" }}>
+          🏛️ Lovely Professional University · Centre for Space Science
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
