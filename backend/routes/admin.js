@@ -65,23 +65,53 @@ router.patch("/applications/:id", auth, async (req, res) => {
 
     // Send email notification
     if (status === "approved") {
-      await sendEmail(app.email, "🚀 Welcome to LPU Space Club!", `
-        <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:32px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0">
-          <h2 style="color:#1d4ed8;margin-bottom:8px">Welcome to LPU Space Club! 🚀</h2>
-          <p style="color:#334155;font-size:15px">Hi ${app.name},</p>
-          <p style="color:#334155;font-size:15px">Your application has been <strong style="color:#16a34a">approved</strong>! You are now an official member of LPU Space Club.</p>
-          <p style="color:#64748b;font-size:13px">Division: <strong>${app.division}</strong></p>
-          <a href="https://spaceclub-sigma.vercel.app/dashboard" style="display:inline-block;margin-top:20px;padding:12px 28px;background:#1d4ed8;color:white;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">Go to Your Dashboard →</a>
-          <p style="color:#94a3b8;font-size:12px;margin-top:24px">LPU Space Club · Centre for Space Science</p>
+      await sendEmail(app.email, "🚀 You're In! Welcome to LPU Space Club", `
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
+          <div style="background:linear-gradient(135deg,#1d4ed8,#0ea5e9);padding:36px 32px;text-align:center">
+            <div style="font-size:48px;margin-bottom:8px">🚀</div>
+            <h1 style="color:white;margin:0;font-size:24px;font-weight:800">Welcome to LPU Space Club!</h1>
+            <p style="color:#bfdbfe;margin:8px 0 0;font-size:14px">Centre for Space Science · Lovely Professional University</p>
+          </div>
+          <div style="padding:32px">
+            <p style="color:#334155;font-size:16px;margin:0 0 16px">Hi <strong>${app.name}</strong>,</p>
+            <p style="color:#334155;font-size:15px;line-height:1.6">Your application has been <strong style="color:#16a34a">✅ Approved!</strong> You are now an official member of LPU Space Club.</p>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin:20px 0">
+              <p style="margin:0;color:#166534;font-size:14px">🎉 <strong>+50 Welcome Points</strong> have been added to your account!</p>
+              <p style="margin:8px 0 0;color:#166534;font-size:13px">Division: <strong>${app.division || "General"}</strong></p>
+            </div>
+            <p style="color:#64748b;font-size:14px;line-height:1.6">Log in to your dashboard to see your profile, register for events, join projects, and start earning more points.</p>
+            <div style="text-align:center;margin:28px 0">
+              <a href="${process.env.FRONTEND_URL || "https://spaceclub-sigma.vercel.app"}/dashboard" style="display:inline-block;padding:14px 32px;background:#1d4ed8;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Go to My Dashboard →</a>
+            </div>
+          </div>
+          <div style="background:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;text-align:center">
+            <p style="color:#94a3b8;font-size:12px;margin:0">LPU Space Club · Centre for Space Science · Lovely Professional University</p>
+            <p style="color:#cbd5e1;font-size:11px;margin:4px 0 0">Phagwara, Punjab 144411</p>
+          </div>
         </div>
       `);
     } else if (status === "rejected") {
       await sendEmail(app.email, "LPU Space Club — Application Update", `
-        <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:32px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0">
-          <h2 style="color:#1d4ed8">LPU Space Club</h2>
-          <p style="color:#334155;font-size:15px">Hi ${app.name}, thank you for applying to LPU Space Club.</p>
-          <p style="color:#334155;font-size:15px">After review, we are unable to approve your application at this time. We encourage you to reapply next semester.</p>
-          <p style="color:#94a3b8;font-size:12px;margin-top:24px">LPU Space Club · Centre for Space Science</p>
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0">
+          <div style="background:linear-gradient(135deg,#1d4ed8,#0ea5e9);padding:36px 32px;text-align:center">
+            <div style="font-size:48px;margin-bottom:8px">📋</div>
+            <h1 style="color:white;margin:0;font-size:24px;font-weight:800">Application Update</h1>
+            <p style="color:#bfdbfe;margin:8px 0 0;font-size:14px">LPU Space Club · Centre for Space Science</p>
+          </div>
+          <div style="padding:32px">
+            <p style="color:#334155;font-size:16px;margin:0 0 16px">Hi <strong>${app.name}</strong>,</p>
+            <p style="color:#334155;font-size:15px;line-height:1.6">Thank you for your interest in LPU Space Club. After reviewing your application, we are unable to offer membership at this time.</p>
+            <p style="color:#334155;font-size:15px;line-height:1.6">We encourage you to attend our upcoming events, build your skills, and reapply next semester. Many of our best members joined after their second application!</p>
+            <div style="background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:16px;margin:20px 0">
+              <p style="margin:0;color:#854d0e;font-size:14px">💡 Tip: Attend our workshops and events before applying again — it will strengthen your application significantly.</p>
+            </div>
+            <div style="text-align:center;margin:28px 0">
+              <a href="${process.env.FRONTEND_URL || "https://spaceclub-sigma.vercel.app"}/events" style="display:inline-block;padding:14px 32px;background:#1d4ed8;color:white;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Explore Upcoming Events →</a>
+            </div>
+          </div>
+          <div style="background:#f8fafc;padding:20px 32px;border-top:1px solid #e2e8f0;text-align:center">
+            <p style="color:#94a3b8;font-size:12px;margin:0">LPU Space Club · Centre for Space Science · Lovely Professional University</p>
+          </div>
         </div>
       `);
     }
