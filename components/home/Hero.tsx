@@ -28,28 +28,38 @@ export default function Hero() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-24 pb-16">
 
-        {/* LPU Official Tags */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-          {lpuTags.map((tag) => (
-            <span key={tag.label}
-              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border"
-              style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text-muted)" }}>
-              {tag.icon} {tag.label}
-            </span>
-          ))}
+        {/* LPU Official Header */}
+        <div className="mb-8">
+          <div className="inline-flex flex-col items-center gap-2">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="text-4xl">🚀</div>
+              <div className="text-left">
+                <div className="text-2xl sm:text-3xl font-black tracking-tight" style={{ color: "var(--text)" }}>
+                  LPU <span className="text-blue-400">Space Club</span>
+                </div>
+                <div className="text-sm font-semibold tracking-widest uppercase text-blue-400/70">
+                  Lovely Professional University
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-green-400/10 border border-green-400/30 text-green-400">
+                ✅ Official Student Club
+              </span>
+              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-400/10 border border-blue-400/30 text-blue-400">
+                📍 Phagwara, Punjab
+              </span>
+              <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-purple-400/10 border border-purple-400/30 text-purple-400">
+                🛰️ Space Innovators
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Main badge */}
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-400/30 rounded-full text-blue-300 text-sm mb-8">
           <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
           Powered by Students. Inspired by the Universe.
-        </div>
-
-        {/* LPU branding line */}
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="h-px w-12 bg-blue-400/30" />
-          <span className="text-xs font-semibold tracking-widest text-blue-400 uppercase">LPU Space Club</span>
-          <div className="h-px w-12 bg-blue-400/30" />
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold leading-tight mb-6" style={{ color: "var(--text)" }}>
