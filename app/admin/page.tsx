@@ -97,7 +97,10 @@ export default function AdminPage() {
     setLoginLoading(false);
   };
 
-  const logout = () => { adminLogout(); setAuthed(false); setPassword(""); };
+  const logout = () => { 
+    adminLogout(); 
+    import("next-auth/react").then(({ signOut }) => signOut({ callbackUrl: "/admin/login" }));
+  };
 
   const switchTab = (t: Tab) => { setTab(t); setAdding(false); setEditId(null); };
 
