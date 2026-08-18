@@ -10,6 +10,9 @@ const eventSchema = new mongoose.Schema(
     capacity: { type: String },
     description: { type: String },
     status: { type: String, enum: ["upcoming", "past"], default: "upcoming" },
+    featured: { type: Boolean, default: false },
+    image: { type: String }, // Cloudinary URL
+    registrationContact: { type: String }, // e.g. phone number or link
     registrations: [{ name: String, email: String, registeredAt: { type: Date, default: Date.now } }],
   },
   { timestamps: true }

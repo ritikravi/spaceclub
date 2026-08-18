@@ -7,6 +7,7 @@ const Contact = require("../models/Contact");
 const CoreMember = require("../models/CoreMember");
 const Student = require("../models/Student");
 const Announcement = require("../models/Announcement");
+const Event = require("../models/Event");
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -373,6 +374,54 @@ router.post("/broadcast", auth, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Server error." });
   }
+});
+
+// ── FEATURED EVENTS ───────────────────────────────────
+// GET featured event (public)
+router.get("/featured-event", async (req, res) => {
+  try {
+    const event = await Event.findOne({ featured: true, status: "upcoming" }).sort({ createdAt: -1 });
+    res.json(event || null);
+  } catch { res.json(null); }
+});
+
+// GET all events (admin)
+router.get("/events", auth, async (req, res) => {
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    res.json(events);
+  } catch { res.json([]); }
+});
+
+// POST create event
+router.post("/events", auth, async (req, res) => {
+  try {
+    const { title, type, date, time, location, capacity, description, status, featured, image, registrationContact } = req.body;
+    if (!title || !type || !date) return res.status(400).json({ error: "Title, type and date required." });
+    // If setting as featured, unfeature others
+    if (featured) await Event.updateMany({}, { featured: false });
+    const event = await Event.create({ title, type, date, time, location, capacity, description, status, featured: !!featured, image, registrationContact });
+    res.status(201).json(event);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// PATCH update event
+router.patch("/events/:id", auth, async (req, res) => {
+  try {
+    // If setting as featured, unfeature others first
+    if (req.body.featured) await Event.updateMany({ _id: { $ne: req.params.id } }, { featured: false });
+    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!event) return res.status(404).json({ error: "Not found." });
+    res.json(event);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// DELETE event
+router.delete("/events/:id", auth, async (req, res) => {
+  try {
+    await Event.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted." });
+  } catch { res.status(500).json({ error: "Server error." }); }
 });
 
 module.exports = router;

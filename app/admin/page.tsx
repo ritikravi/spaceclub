@@ -12,9 +12,10 @@ import {
   getCoreMembers, addCoreMember, updateCoreMember, deleteCoreMember,
   uploadPhoto, getAnnouncements, createAnnouncement, toggleAnnouncement,
   deleteAnnouncement, broadcastToAll,
+  getAdminEvents, createEvent, updateEvent, deleteEvent,
 } from "@/lib/adminApi";
 
-type Tab = "dashboard" | "applications" | "messages" | "members" | "announcements";
+type Tab = "dashboard" | "applications" | "messages" | "members" | "announcements" | "events";
 
 const divisions = ["Leadership","Aerospace","Robotics","AI & Data","Embedded Systems","Software","Research","Astronomy","Media & Design","Events","Outreach"];
 const roles = ["Faculty Head","Faculty Coordinator","Student Lead","Division Head","Core Member","Member"];
@@ -58,6 +59,13 @@ export default function AdminPage() {
   const [backendError, setBackendError] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // Events
+  const [events, setEvents] = useState<any[]>([]);
+  const [eventForm, setEventForm] = useState<any>({ title: "", type: "University Event", date: "", time: "", location: "", capacity: "", description: "", registrationContact: "", featured: false, image: "", status: "upcoming" });
+  const [eventAdding, setEventAdding] = useState(false);
+  const [eventEditId, setEventEditId] = useState<string|null>(null);
+  const [eventUploading, setEventUploading] = useState(false);
+
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +100,7 @@ export default function AdminPage() {
       else if (t === "messages") setMessages(await getMessages());
       else if (t === "members") setMembers(await getCoreMembers());
       else if (t === "announcements") setAnnouncements(await getAnnouncements());
+      else if (t === "events") setEvents(await getAdminEvents());
     } catch (e: any) {
       setBackendError(e.message || "Cannot connect to backend.");
     }
@@ -243,6 +252,7 @@ export default function AdminPage() {
                 {id:"messages",icon:Mail,label:"Messages"},
                 {id:"members",icon:Users,label:"Core Members"},
                 {id:"announcements",icon:Megaphone,label:"Announcements"},
+                {id:"events",icon:Radio,label:"Events"},
               ] as {id:Tab,icon:any,label:string}[]).map(item => (
                 <button key={item.id} onClick={()=>switchTab(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-1 transition-all ${tab===item.id ? "bg-blue-600 text-white" : "hover:bg-blue-400/10"}`}
@@ -272,6 +282,7 @@ export default function AdminPage() {
                 {tab==="messages"&&"Contact Messages"}
                 {tab==="members"&&"Core Members"}
                 {tab==="announcements"&&"Announcements & Broadcast"}
+                {tab==="events"&&"Featured Events"}
               </h1>
               <button onClick={()=>load(tab)} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all hover:text-blue-400" style={{color:"var(--text-muted)",background:"var(--surface)",border:"1px solid var(--border)"}}>
                 <RefreshCw size={12}/> Refresh
@@ -582,6 +593,130 @@ export default function AdminPage() {
           </main>
         </div>
       </div>
+
+      {/* ── EVENTS ── */}
+            {!loading && tab==="events" && (
+              <div className="space-y-5">
+                <div className="glass rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-bold text-base" style={{color:"var(--text)"}}>Featured Events</h3>
+                      <p className="text-xs mt-0.5" style={{color:"var(--text-muted)"}}>The featured event shows as a banner at the top of your site. Only one can be featured at a time.</p>
+                    </div>
+                    <button onClick={()=>{setEventAdding(true);setEventEditId(null);setEventForm({title:"",type:"University Event",date:"",time:"",location:"",capacity:"",description:"",registrationContact:"",featured:false,image:"",status:"upcoming"});}}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 text-sm font-semibold rounded-xl transition-all border border-blue-400/30">
+                      <Plus size={14}/> Add Event
+                    </button>
+                  </div>
+
+                  {/* Form */}
+                  {(eventAdding || eventEditId) && (
+                    <div className="rounded-xl p-5 mb-5 space-y-3" style={{background:"var(--bg-alt)",border:"1px solid var(--border)"}}>
+                      <h4 className="text-sm font-semibold text-blue-400">{eventAdding ? "New Event" : "Edit Event"}</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[
+                          {label:"Title *",key:"title",ph:"e.g. National Space Day 2026"},
+                          {label:"Type",key:"type",ph:"e.g. University Event, Workshop"},
+                          {label:"Date",key:"date",ph:"e.g. Aug 21, 2026"},
+                          {label:"Time",key:"time",ph:"e.g. 10:00 AM – 5:00 PM"},
+                          {label:"Location",key:"location",ph:"e.g. Room 30-603, LPU"},
+                          {label:"Capacity",key:"capacity",ph:"e.g. All Schools of LPU"},
+                          {label:"Registration Contact",key:"registrationContact",ph:"e.g. 9463457100 / 9897120653"},
+                        ].map(({label,key,ph})=>(
+                          <div key={key}>
+                            <label className="block text-xs font-medium mb-1" style={{color:"var(--text-muted)"}}>{label}</label>
+                            <input value={eventForm[key]} onChange={e=>setEventForm((f:any)=>({...f,[key]:e.target.value}))} placeholder={ph}
+                              className="w-full px-3 py-2 rounded-xl text-sm focus:outline-none" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+                          </div>
+                        ))}
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1" style={{color:"var(--text-muted)"}}>Description</label>
+                        <textarea rows={2} value={eventForm.description} onChange={e=>setEventForm((f:any)=>({...f,description:e.target.value}))} placeholder="Short description..."
+                          className="w-full px-3 py-2 rounded-xl text-sm resize-none focus:outline-none" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+                      </div>
+                      {/* Image upload */}
+                      <div>
+                        <label className="block text-xs font-medium mb-1" style={{color:"var(--text-muted)"}}>Event Flyer / Image</label>
+                        <div className="flex items-center gap-3">
+                          {eventForm.image && <img src={eventForm.image} alt="flyer" className="w-16 h-16 rounded-lg object-cover border border-white/10"/>}
+                          <label className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm cursor-pointer transition-all border ${eventUploading?"opacity-50":"hover:border-blue-400"}`}
+                            style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>
+                            {eventUploading ? "Uploading..." : "📷 Upload Flyer"}
+                            <input type="file" accept="image/*" className="hidden" disabled={eventUploading} onChange={async(e)=>{
+                              const file = e.target.files?.[0]; if(!file) return;
+                              setEventUploading(true);
+                              try {
+                                const fd = new FormData(); fd.append("image", file);
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/upload`,{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("admin_token")}`},body:fd});
+                                const d = await res.json();
+                                if(res.ok) setEventForm((f:any)=>({...f,image:d.url}));
+                                else showToast("Upload failed.");
+                              } catch { showToast("Upload failed."); }
+                              setEventUploading(false);
+                            }}/>
+                          </label>
+                          {eventForm.image && <button onClick={()=>setEventForm((f:any)=>({...f,image:""}))} className="text-xs text-red-400">Remove</button>}
+                        </div>
+                      </div>
+                      {/* Toggles */}
+                      <div className="flex gap-4 flex-wrap">
+                        <label className="flex items-center gap-2 text-sm cursor-pointer" style={{color:"var(--text-muted)"}}>
+                          <input type="checkbox" checked={eventForm.featured} onChange={e=>setEventForm((f:any)=>({...f,featured:e.target.checked}))} className="accent-blue-500"/>
+                          ⭐ Set as Featured (shows banner on site)
+                        </label>
+                        <label className="flex items-center gap-2 text-sm cursor-pointer" style={{color:"var(--text-muted)"}}>
+                          <input type="checkbox" checked={eventForm.status==="past"} onChange={e=>setEventForm((f:any)=>({...f,status:e.target.checked?"past":"upcoming"}))} className="accent-blue-500"/>
+                          Mark as Past
+                        </label>
+                      </div>
+                      <div className="flex gap-3">
+                        <button onClick={async()=>{
+                          if(!eventForm.title||!eventForm.date) return showToast("Title and date required.");
+                          try {
+                            if(eventEditId){ const ev=await updateEvent(eventEditId,eventForm); setEvents(l=>l.map(x=>x._id===eventEditId?ev:x)); showToast("Updated!"); }
+                            else { const ev=await createEvent(eventForm); setEvents(l=>[ev,...l]); showToast("Event added!"); }
+                            setEventAdding(false); setEventEditId(null);
+                          } catch { showToast("Failed to save."); }
+                        }} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all">
+                          Save
+                        </button>
+                        <button onClick={()=>{setEventAdding(false);setEventEditId(null);}} className="px-4 py-2 text-sm rounded-xl transition-all" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>Cancel</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Event list */}
+                  {events.length===0 && <div className="text-center py-8" style={{color:"var(--text-faint)"}}>No events yet. Add one above.</div>}
+                  <div className="space-y-3">
+                    {events.map(ev=>(
+                      <div key={ev._id} className={`rounded-xl p-4 flex gap-4 items-start border ${ev.featured?"border-orange-400/40 bg-orange-400/5":"border-white/5"}`} style={{background:ev.featured?"":"var(--bg-alt)"}}>
+                        {ev.image && <img src={ev.image} alt={ev.title} className="w-14 h-14 rounded-lg object-cover shrink-0 border border-white/10"/>}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="font-semibold text-sm" style={{color:"var(--text)"}}>{ev.title}</span>
+                            {ev.featured && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-400/20 text-orange-400 font-semibold">⭐ Featured</span>}
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${ev.status==="upcoming"?"bg-green-400/10 text-green-400":"bg-slate-400/10 text-slate-400"}`}>{ev.status}</span>
+                          </div>
+                          <div className="text-xs" style={{color:"var(--text-muted)"}}>{ev.date}{ev.time&&` · ${ev.time}`}{ev.location&&` · ${ev.location}`}</div>
+                          {ev.registrationContact && <div className="text-xs text-blue-400 mt-0.5">📞 {ev.registrationContact}</div>}
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          {!ev.featured && (
+                            <button onClick={async()=>{const u=await updateEvent(ev._id,{featured:true});setEvents(l=>l.map(x=>({...x,featured:x._id===ev._id?true:false})));showToast("Set as featured!");}}
+                              className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-400/10 hover:bg-orange-400/20 text-orange-400 border border-orange-400/20 transition-all">Feature</button>
+                          )}
+                          <button onClick={()=>{setEventEditId(ev._id);setEventAdding(false);setEventForm({title:ev.title,type:ev.type,date:ev.date,time:ev.time||"",location:ev.location||"",capacity:ev.capacity||"",description:ev.description||"",registrationContact:ev.registrationContact||"",featured:ev.featured,image:ev.image||"",status:ev.status});}}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:text-blue-400 transition-all" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Edit2 size={13}/></button>
+                          <button onClick={async()=>{await deleteEvent(ev._id);setEvents(l=>l.filter(x=>x._id!==ev._id));showToast("Deleted.");}}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center hover:text-red-400 transition-all" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Trash2 size={13}/></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
       {/* ── BROADCAST MODAL ── */}
       {broadcastModal && (

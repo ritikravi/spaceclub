@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SessionProvider from "@/components/SessionProvider";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
+import FeaturedEventBanner from "@/components/FeaturedEventBanner";
 
 export const metadata: Metadata = {
   title: "LPU Space Club | Centre for Space Science",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SessionProvider>
             <Navbar />
             <AnnouncementBanner />
+            <FeaturedEventBanner />
             <main>{children}</main>
             <Footer />
           </SessionProvider>

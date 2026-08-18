@@ -102,3 +102,30 @@ export async function broadcastToAll(message: string, type: string) {
   if (!res.ok) throw new Error("Broadcast failed.");
   return res.json();
 }
+
+// ── EVENTS ──
+export async function getAdminEvents() {
+  const res = await fetch(`${API}/api/admin/events`, { headers: headers() });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function createEvent(data: object) {
+  const res = await fetch(`${API}/api/admin/events`, {
+    method: "POST", headers: headers(), body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create event.");
+  return res.json();
+}
+
+export async function updateEvent(id: string, data: object) {
+  const res = await fetch(`${API}/api/admin/events/${id}`, {
+    method: "PATCH", headers: headers(), body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update event.");
+  return res.json();
+}
+
+export async function deleteEvent(id: string) {
+  await fetch(`${API}/api/admin/events/${id}`, { method: "DELETE", headers: headers() });
+}
