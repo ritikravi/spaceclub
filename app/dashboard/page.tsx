@@ -235,14 +235,53 @@ export default function DashboardPage() {
                   </div>
                 )}
 
-                {/* Status card */}
-                <div className={`glass rounded-2xl p-6 border-l-4 ${profile.applicationStatus === "approved" ? "border-green-400" : profile.applicationStatus === "pending" ? "border-yellow-400" : "border-gray-400"}`}>
-                  <h2 className="font-bold text-lg mb-1" style={{ color: "var(--text)" }}>Application Status</h2>
+                {/* Status card — always visible */}
+                <div className={`glass rounded-2xl p-6 border-l-4 ${
+                  profile.applicationStatus === "approved" ? "border-green-400 bg-green-400/5" :
+                  profile.applicationStatus === "pending" ? "border-yellow-400 bg-yellow-400/5" :
+                  profile.applicationStatus === "rejected" ? "border-red-400 bg-red-400/5" :
+                  "border-gray-400"
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <h2 className="font-bold text-lg" style={{ color: "var(--text)" }}>Application Status</h2>
+                    <span className={`text-xs px-3 py-1 rounded-full font-bold ${statusConfig[profile.applicationStatus]?.color}`}>
+                      {statusConfig[profile.applicationStatus]?.label}
+                    </span>
+                  </div>
                   <p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>{statusConfig[profile.applicationStatus]?.desc}</p>
+
+                  {/* Step tracker */}
+                  {profile.applicationStatus !== "not_applied" && (
+                    <div className="flex items-center gap-0 mt-4">
+                      {[
+                        { key: "applied", label: "Applied", done: true },
+                        { key: "review", label: "Under Review", done: profile.applicationStatus === "approved" || profile.applicationStatus === "rejected" || profile.applicationStatus === "pending" },
+                        { key: "decision", label: profile.applicationStatus === "approved" ? "Approved ✅" : profile.applicationStatus === "rejected" ? "Rejected ❌" : "Decision", done: profile.applicationStatus === "approved" || profile.applicationStatus === "rejected" },
+                      ].map((step, i, arr) => (
+                        <div key={step.key} className="flex items-center flex-1">
+                          <div className="flex flex-col items-center">
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                              step.done
+                                ? profile.applicationStatus === "rejected" && i === 2 ? "bg-red-500 border-red-500 text-white" : "bg-blue-600 border-blue-600 text-white"
+                                : "border-white/20 text-slate-500"
+                            }`}>{step.done ? (profile.applicationStatus === "rejected" && i === 2 ? "✕" : "✓") : i + 1}</div>
+                            <div className={`text-xs mt-1.5 font-medium whitespace-nowrap ${step.done ? (profile.applicationStatus === "rejected" && i === 2 ? "text-red-400" : "text-blue-400") : "text-slate-500"}`}>{step.label}</div>
+                          </div>
+                          {i < arr.length - 1 && (
+                            <div className={`flex-1 h-0.5 mx-1 mb-5 ${step.done && arr[i+1].done ? "bg-blue-600" : "bg-white/10"}`} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {profile.applicationStatus === "not_applied" && (
                     <Link href="/join" className="inline-flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all">
                       Apply Now →
                     </Link>
+                  )}
+                  {profile.applicationStatus === "pending" && (
+                    <p className="text-xs mt-3 text-yellow-400/80">You'll get a notification here and via email once the admin reviews your application.</p>
                   )}
                 </div>
 

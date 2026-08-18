@@ -52,9 +52,22 @@ router.patch("/applications/:id", auth, async (req, res) => {
     if (!app) return res.status(404).json({ error: "Not found." });
 
     // Sync to Student + send email
-    const student = await Student.findOne({ email: app.email });
+    let student = await Student.findOne({ email: app.email });
+    if (!student && status === "approved") {
+      // Create a Student record so the notification is saved even before first login
+      student = await Student.create({
+        email: app.email,
+        name: app.name,
+        division: app.division || "",
+        applicationStatus: status,
+        applicationId: app._id,
+      });
+    }
     if (student) {
       student.applicationStatus = status;
+      // Sync division from Member → Student so broadcast targeting works
+      if (app.division) student.division = app.division;
+      student.applicationId = app._id;
       const msg = status === "approved"
         ? `🎉 Congratulations! Your application to LPU Space Club has been approved. Welcome aboard!`
         : `Your Space Club application has been reviewed. Unfortunately it was not approved this time. You can reapply next semester.`;
@@ -276,18 +289,86 @@ router.delete("/announcements/:id", auth, async (req, res) => {
   } catch { res.status(500).json({ error: "Server error." }); }
 });
 
+// ── BACKFILL: create Student records for approved Members who don't have one ──
+router.post("/backfill-students", auth, async (req, res) => {
+  try {
+    const approvedMembers = await Member.find({ status: "approved" });
+    let created = 0, notified = 0;
+
+    for (const m of approvedMembers) {
+      let student = await Student.findOne({ email: m.email });
+      if (!student) {
+        student = await Student.create({
+          email: m.email,
+          name: m.name,
+          division: m.division || "",
+          applicationStatus: "approved",
+          applicationId: m._id,
+          points: 50,
+          notifications: [{
+            message: "🎉 Congratulations! Your application to LPU Space Club has been approved. Welcome aboard!",
+            type: "success",
+          }],
+        });
+        created++;
+      } else {
+        // Sync status + division if not already correct
+        let changed = false;
+        if (student.applicationStatus !== "approved") { student.applicationStatus = "approved"; changed = true; }
+        if (m.division && student.division !== m.division) { student.division = m.division; changed = true; }
+        if (!student.applicationId) { student.applicationId = m._id; changed = true; }
+        // Push notification only if they don't have an approval notification yet
+        const hasApprovalNotif = student.notifications.some(n => n.message.includes("approved"));
+        if (!hasApprovalNotif) {
+          student.notifications.push({
+            message: "🎉 Congratulations! Your application to LPU Space Club has been approved. Welcome aboard!",
+            type: "success",
+          });
+          if (student.points < 50) student.points += 50;
+          changed = true;
+          notified++;
+        }
+        if (changed) await student.save();
+      }
+    }
+
+    res.json({ message: `Done. Created ${created} new student records, sent approval notification to ${notified} existing students.`, created, notified });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
 // ── BROADCAST ─────────────────────────────────────────
-// POST broadcast notification to ALL approved students
+// POST broadcast notification — supports targeting by status or division
 router.post("/broadcast", auth, async (req, res) => {
   try {
-    const { message, type } = req.body;
+    const { message, type, target, division } = req.body;
     if (!message) return res.status(400).json({ error: "Message required." });
-    const students = await Student.find({ applicationStatus: "approved" });
-    for (const s of students) {
-      s.notifications.push({ message, type: type || "info" });
-      await s.save();
+
+    let students = [];
+
+    if (target === "division" && division) {
+      // Cross-reference Member model for accurate division data
+      const members = await Member.find({ status: "approved", division });
+      const emails = members.map(m => m.email);
+      students = await Student.find({ email: { $in: emails } });
+    } else if (target === "pending") {
+      students = await Student.find({ applicationStatus: "pending" });
+    } else {
+      // all_approved (default): cross-reference approved Members for accuracy
+      const approvedMembers = await Member.find({ status: "approved" });
+      const emails = approvedMembers.map(m => m.email);
+      students = await Student.find({ email: { $in: emails } });
     }
-    res.json({ message: `Broadcast sent to ${students.length} members.`, count: students.length });
+
+    const notification = { message, type: type || "info" };
+    await Student.updateMany(
+      { _id: { $in: students.map(s => s._id) } },
+      { $push: { notifications: notification } }
+    );
+
+    res.json({ message: `Sent to ${students.length} members.`, count: students.length });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error." });

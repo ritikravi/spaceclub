@@ -51,6 +51,8 @@ export default function AdminPage() {
   const [broadcastModal, setBroadcastModal] = useState(false);
   const [broadcastMsg, setBroadcastMsg] = useState("");
   const [broadcastType, setBroadcastType] = useState("info");
+  const [broadcastTarget, setBroadcastTarget] = useState("all_approved");
+  const [broadcastDivision, setBroadcastDivision] = useState("Aerospace");
   const [broadcastSending, setBroadcastSending] = useState(false);
 
   const [backendError, setBackendError] = useState("");
@@ -493,6 +495,26 @@ export default function AdminPage() {
                       <Radio size={14}/> Broadcast
                     </button>
                   </div>
+                  {/* Backfill: sync approved members who don't have Student records yet */}
+                  <div className="border-t pt-4 mt-2 flex items-center justify-between" style={{borderColor:"var(--border)"}}>
+                    <div>
+                      <div className="text-xs font-semibold" style={{color:"var(--text-muted)"}}>🔄 Sync Approved Members</div>
+                      <div className="text-xs mt-0.5" style={{color:"var(--text-faint)"}}>Creates dashboard accounts + sends approval notification to members approved before they logged in.</div>
+                    </div>
+                    <button onClick={async()=>{
+                      try{
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/admin/backfill-students`,{
+                          method:"POST",
+                          headers:{"Authorization":`Bearer ${localStorage.getItem("admin_token")}`},
+                        });
+                        const r = await res.json();
+                        if(res.ok) showToast(`✅ ${r.message}`);
+                        else showToast("Sync failed.");
+                      }catch{showToast("Sync failed.");}
+                    }} className="shrink-0 ml-4 flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 text-sm font-semibold rounded-xl transition-all border border-blue-400/30">
+                      Sync Now
+                    </button>
+                  </div>
                 </div>
 
                 {/* Create announcement */}
@@ -564,21 +586,44 @@ export default function AdminPage() {
       {/* ── BROADCAST MODAL ── */}
       {broadcastModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={()=>setBroadcastModal(false)}>
-          <div className="glass rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e=>e.stopPropagation()}>
+          <div className="glass rounded-2xl p-6 w-full max-w-lg shadow-2xl" onClick={e=>e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-lg flex items-center gap-2" style={{color:"var(--text)"}}><Radio size={16} className="text-yellow-400"/> Broadcast to All Members</h3>
+              <h3 className="font-bold text-lg flex items-center gap-2" style={{color:"var(--text)"}}><Radio size={16} className="text-yellow-400"/> Send Message to Members</h3>
               <button onClick={()=>setBroadcastModal(false)} className="text-slate-400 hover:text-white"><X size={18}/></button>
             </div>
-            <p className="text-xs mb-4 text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-xl px-3 py-2">
-              ⚠️ This will send a notification to ALL approved members at once.
-            </p>
+
+            {/* Target */}
             <div className="mb-3">
-              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Type</label>
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Send To</label>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  {val:"all_approved",label:"👥 All Members"},
+                  {val:"pending",label:"⏳ Pending Applicants"},
+                  {val:"division",label:"🔭 Specific Division"},
+                ].map(t=>(
+                  <button key={t.val} onClick={()=>setBroadcastTarget(t.val)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg border transition-all ${broadcastTarget===t.val?"bg-blue-600 text-white border-blue-600":"border-white/10 text-slate-400"}`}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              {broadcastTarget==="division" && (
+                <select value={broadcastDivision} onChange={e=>setBroadcastDivision(e.target.value)}
+                  className="mt-2 w-full px-3 py-2 rounded-xl text-sm focus:outline-none"
+                  style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text)"}}>
+                  {divisions.map(d=><option key={d} value={d}>{d}</option>)}
+                </select>
+              )}
+            </div>
+
+            {/* Type */}
+            <div className="mb-3">
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Message Type</label>
               <div className="flex gap-2 flex-wrap">
                 {[
                   {val:"info",label:"📢 Info",cls:"text-blue-400 bg-blue-400/10 border-blue-400/30"},
-                  {val:"success",label:"✅ Success",cls:"text-green-400 bg-green-400/10 border-green-400/30"},
-                  {val:"warning",label:"⚠️ Warning",cls:"text-yellow-400 bg-yellow-400/10 border-yellow-400/30"},
+                  {val:"success",label:"✅ Good News",cls:"text-green-400 bg-green-400/10 border-green-400/30"},
+                  {val:"warning",label:"⚠️ Reminder",cls:"text-yellow-400 bg-yellow-400/10 border-yellow-400/30"},
                   {val:"urgent",label:"🚨 Urgent",cls:"text-red-400 bg-red-400/10 border-red-400/30"},
                 ].map(t=>(
                   <button key={t.val} onClick={()=>setBroadcastType(t.val)}
@@ -588,29 +633,41 @@ export default function AdminPage() {
                 ))}
               </div>
             </div>
+
+            {/* Message */}
             <div className="mb-4">
-              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Message</label>
-              <textarea rows={4} value={broadcastMsg} onChange={e=>setBroadcastMsg(e.target.value)} placeholder="Write your broadcast message..."
+              <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Your Message</label>
+              <textarea rows={4} value={broadcastMsg} onChange={e=>setBroadcastMsg(e.target.value)}
+                placeholder="Write your message to the members..."
                 className="w-full px-3 py-2.5 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-400 transition-all"
                 style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text)"}}/>
+              <p className="text-xs mt-1" style={{color:"var(--text-faint)"}}>Members will see this instantly in their Dashboard → Notifications.</p>
             </div>
+
             <div className="flex gap-3">
               <button onClick={async()=>{
                 if(!broadcastMsg.trim()) return;
                 setBroadcastSending(true);
-                try{const r=await broadcastToAll(broadcastMsg,broadcastType);showToast(`Sent to ${r.count} members!`);setBroadcastModal(false);}
-                catch{showToast("Broadcast failed.");}
+                try{
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/admin/broadcast`,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","Authorization":`Bearer ${localStorage.getItem("admin_token")}`},
+                    body:JSON.stringify({message:broadcastMsg,type:broadcastType,target:broadcastTarget,division:broadcastDivision}),
+                  });
+                  const r = await res.json();
+                  if(res.ok){showToast(`✅ Sent to ${r.count} member${r.count!==1?"s":""}!`);setBroadcastModal(false);setBroadcastMsg("");}
+                  else showToast("Failed to send.");
+                }catch{showToast("Failed to send.");}
                 setBroadcastSending(false);
               }} disabled={!broadcastMsg.trim()||broadcastSending}
-                className="flex-1 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                <Radio size={14}/> {broadcastSending?"Sending...":"Send to All Members"}
+                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                <MessageSquare size={14}/> {broadcastSending?"Sending...":"Send Message"}
               </button>
               <button onClick={()=>setBroadcastModal(false)} className="px-4 py-2.5 text-sm rounded-xl transition-all" style={{background:"var(--bg-alt)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>Cancel</button>
             </div>
           </div>
         </div>
       )}
-
       {/* ── NOTIFY MODAL ── */}
       {notifyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={()=>setNotifyModal(null)}>
