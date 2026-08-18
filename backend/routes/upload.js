@@ -40,8 +40,8 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 
     const folder = req.query.folder === "events" ? "spaceclub/events" : "spaceclub/members";
     const transformation = req.query.folder === "events"
-      ? [{ width: 1200, crop: "limit" }]  // events: preserve aspect ratio, max width 1200
-      : [{ width: 400, height: 400, crop: "fill", gravity: "face" }]; // members: square crop
+      ? [{ quality: "auto:best", fetch_format: "auto" }]  // events: preserve original quality, auto format
+      : [{ width: 400, height: 400, crop: "fill", gravity: "face", quality: "auto:good" }]; // members: square crop
 
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
