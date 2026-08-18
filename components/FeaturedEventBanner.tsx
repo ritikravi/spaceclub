@@ -29,7 +29,7 @@ export default function FeaturedEventBanner() {
         <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-8 py-14 sm:py-20">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
 
-            {/* Flyer — large portrait image with full quality */}
+            {/* Flyer — Full quality original image */}
             {event.image && (
               <div className="shrink-0 w-full lg:w-auto flex justify-center lg:justify-start">
                 <button onClick={() => setImgOpen(true)} className="group block">
@@ -37,8 +37,14 @@ export default function FeaturedEventBanner() {
                     <img
                       src={event.image}
                       alt={event.title}
+                      loading="eager"
                       className="block max-w-none h-auto group-hover:scale-[1.02] transition-transform duration-500"
-                      style={{ width: "auto", maxHeight: "70vh", imageRendering: "-webkit-optimize-contrast" }}
+                      style={{ 
+                        width: "auto", 
+                        maxHeight: "70vh", 
+                        imageRendering: "crisp-edges",
+                        WebkitFontSmoothing: "antialiased"
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6">
                       <span className="bg-black/80 text-white text-sm font-bold px-6 py-3 rounded-xl border border-white/20">
@@ -117,7 +123,7 @@ export default function FeaturedEventBanner() {
         </div>
       </div>
 
-      {/* Full flyer modal - Full quality view */}
+      {/* Full flyer modal - Original quality */}
       {imgOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4" onClick={() => setImgOpen(false)}>
           <div className="relative flex flex-col items-center max-h-screen" onClick={e => e.stopPropagation()}>
@@ -125,9 +131,19 @@ export default function FeaturedEventBanner() {
               className="mb-4 flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition-colors bg-black/50 px-4 py-2 rounded-full">
               <X size={15} /> Close
             </button>
-            <img src={event.image} alt={event.title}
+            <img 
+              src={event.image} 
+              alt={event.title}
+              loading="eager"
               className="rounded-2xl shadow-2xl"
-              style={{ maxHeight: "85vh", width: "auto", maxWidth: "100%", imageRendering: "-webkit-optimize-contrast" }} />
+              style={{ 
+                maxHeight: "85vh", 
+                width: "auto", 
+                maxWidth: "100%", 
+                imageRendering: "crisp-edges",
+                WebkitFontSmoothing: "antialiased"
+              }} 
+            />
             {event.registrationContact && (
               <div className="text-center text-orange-300 text-sm mt-3 font-medium">
                 📞 Registration: {event.registrationContact}

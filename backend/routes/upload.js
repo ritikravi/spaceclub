@@ -39,13 +39,16 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No file uploaded." });
 
     const folder = req.query.folder === "events" ? "spaceclub/events" : "spaceclub/members";
-    const transformation = req.query.folder === "events"
-      ? [{ quality: "auto:best", fetch_format: "auto" }]  // events: preserve original quality, auto format
-      : [{ width: 400, height: 400, crop: "fill", gravity: "face", quality: "auto:good" }]; // members: square crop
+    
+    // Events: NO transformations - upload original quality like manual Cloudinary upload
+    // Members: square crop for profile photos
+    const uploadOptions = req.query.folder === "events"
+      ? { folder, resource_type: "image" }  // No transformation - original file
+      : { folder, transformation: [{ width: 400, height: 400, crop: "fill", gravity: "face" }] };
 
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder, transformation },
+        uploadOptions,
         (error, result) => { if (error) reject(error); else resolve(result); }
       ).end(req.file.buffer);
     });
