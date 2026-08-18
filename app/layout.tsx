@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SessionProvider from "@/components/SessionProvider";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
-import FeaturedEventBanner from "@/components/FeaturedEventBanner";
 
 export const metadata: Metadata = {
   title: "LPU Space Club | Centre for Space Science",
@@ -22,7 +21,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* mt-16 pushes below the fixed navbar (navbar is ~64px tall) */}
             <div className="mt-16">
               <AnnouncementBanner />
-              <FeaturedEventBanner />
             </div>
             <main>{children}</main>
             <Footer />
