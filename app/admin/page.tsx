@@ -648,7 +648,7 @@ export default function AdminPage() {
                               setEventUploading(true);
                               try {
                                 const fd = new FormData(); fd.append("image", file);
-                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/upload`,{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("admin_token")}`},body:fd});
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/upload?folder=events`,{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("admin_token")}`},body:fd});
                                 const d = await res.json();
                                 if(res.ok) setEventForm((f:any)=>({...f,image:d.url}));
                                 else showToast("Upload failed.");
@@ -677,7 +677,7 @@ export default function AdminPage() {
                             if(eventEditId){ const ev=await updateEvent(eventEditId,eventForm); setEvents(l=>l.map(x=>x._id===eventEditId?ev:x)); showToast("Updated!"); }
                             else { const ev=await createEvent(eventForm); setEvents(l=>[ev,...l]); showToast("Event added!"); }
                             setEventAdding(false); setEventEditId(null);
-                          } catch { showToast("Failed to save."); }
+                          } catch(err:any) { showToast(err?.message || "Failed to save."); }
                         }} className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-all">
                           Save
                         </button>

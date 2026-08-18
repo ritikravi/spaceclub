@@ -26,7 +26,7 @@ console.log("Cloudinary config:", {
 // Use memory storage — no disk needed
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith("image/")) cb(null, true);
     else cb(new Error("Only image files allowed."));
@@ -38,10 +38,14 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded." });
 
-    // Upload buffer to Cloudinary
+    const folder = req.query.folder === "events" ? "spaceclub/events" : "spaceclub/members";
+    const transformation = req.query.folder === "events"
+      ? [{ width: 1200, crop: "limit" }]  // events: preserve aspect ratio, max width 1200
+      : [{ width: 400, height: 400, crop: "fill", gravity: "face" }]; // members: square crop
+
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: "spaceclub/members", transformation: [{ width: 400, height: 400, crop: "fill", gravity: "face" }] },
+        { folder, transformation },
         (error, result) => { if (error) reject(error); else resolve(result); }
       ).end(req.file.buffer);
     });
