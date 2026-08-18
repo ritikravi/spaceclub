@@ -45,7 +45,7 @@ export default function JoinPage() {
   };
 
   return (
-    <div className="min-h-screen section-bg pt-20">
+    <div className="min-h-screen section-bg">
       {/* Hero */}
       <section className="py-20 section-bg-alt">
         <div className="max-w-screen-xl mx-auto px-6 sm:px-10 text-center">

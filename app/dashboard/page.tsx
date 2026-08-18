@@ -66,10 +66,10 @@ export default function DashboardPage() {
     }));
   };
 
-  if (status === "loading") return <div className="min-h-screen section-bg flex items-center justify-center pt-20 text-blue-400">Loading...</div>;
+  if (status === "loading") return <div className="min-h-screen section-bg flex items-center justify-center text-blue-400">Loading...</div>;
 
   if (!session) return (
-    <div className="min-h-screen section-bg flex items-center justify-center pt-20 px-4">
+    <div className="min-h-screen section-bg flex items-center justify-center px-4">
       <div className="glass rounded-2xl p-10 text-center max-w-sm w-full">
         <div className="text-5xl mb-4">🚀</div>
         <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--text)" }}>Student Dashboard</h1>
@@ -91,7 +91,7 @@ export default function DashboardPage() {
   const unread = profile?.notifications?.filter((n: any) => !n.read).length || 0;
 
   return (
-    <div className="min-h-screen section-bg pt-20">
+    <div className="min-h-screen section-bg">
       {toast && <div className="fixed top-24 right-4 z-50 px-4 py-2 bg-green-600 text-white text-sm rounded-xl shadow-lg">{toast}</div>}
 
       <div className="max-w-screen-xl mx-auto px-6 sm:px-10 py-8">

@@ -62,7 +62,7 @@ const achievements = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen pt-20 section-bg">
+    <div className="min-h-screen section-bg">
       {/* Hero */}
       <section className="py-20" style={{ background: "var(--bg-alt)" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">

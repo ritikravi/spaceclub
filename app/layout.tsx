@@ -19,8 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <SessionProvider>
             <Navbar />
-            <AnnouncementBanner />
-            <FeaturedEventBanner />
+            {/* mt-16 pushes below the fixed navbar (navbar is ~64px tall) */}
+            <div className="mt-16">
+              <AnnouncementBanner />
+              <FeaturedEventBanner />
+            </div>
             <main>{children}</main>
             <Footer />
           </SessionProvider>

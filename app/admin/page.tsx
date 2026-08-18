@@ -193,7 +193,7 @@ export default function AdminPage() {
 
   // ── Login Screen ──
   if (!authed) return (
-    <div className="min-h-screen section-bg flex items-center justify-center pt-20 px-4">
+    <div className="min-h-screen section-bg flex items-center justify-center px-4">
       <div className="glass rounded-2xl p-10 w-full max-w-sm text-center">
         <div className="w-14 h-14 bg-blue-500/10 border border-blue-400/30 rounded-2xl flex items-center justify-center mx-auto mb-5">
           <Lock size={24} className="text-blue-400" />
@@ -218,7 +218,7 @@ export default function AdminPage() {
 
   // ── Admin UI ──
   return (
-    <div className="min-h-screen section-bg pt-20">
+    <div className="min-h-screen section-bg">
       {toast && (
         <div className="fixed top-24 right-4 z-50 px-4 py-2 bg-green-600 text-white text-sm rounded-xl shadow-lg">{toast}</div>
       )}

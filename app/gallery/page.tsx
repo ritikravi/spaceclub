@@ -17,7 +17,7 @@ const photos = [
 
 export default function GalleryPage() {
   return (
-    <div className="min-h-screen bg-[#050a14] pt-24">
+    <div className="min-h-screen bg-[#050a14]">
       <section className="relative py-20 overflow-hidden">
         <StarField />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">

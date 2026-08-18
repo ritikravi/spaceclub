@@ -73,7 +73,7 @@ export default function EventsPage() {
   const isApprovedMember = profile?.applicationStatus === "approved";
 
   return (
-    <div className="min-h-screen bg-[#050a14] pt-24">
+    <div className="min-h-screen bg-[#050a14]">
       {toast && <div className="fixed top-24 right-4 z-50 px-4 py-2 bg-green-600 text-white text-sm rounded-xl shadow-lg">{toast}</div>}
 
       <section className="relative py-20 overflow-hidden">

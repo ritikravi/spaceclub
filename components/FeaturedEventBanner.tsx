@@ -20,8 +20,8 @@ export default function FeaturedEventBanner() {
 
   return (
     <>
-      {/* Full-width featured section — pt-20 accounts for fixed navbar height */}
-      <div className="w-full relative overflow-hidden pt-20" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)" }}>
+      {/* Full-width featured section — sits naturally below fixed navbar */}
+      <div className="w-full relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)" }}>
         <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ background: "radial-gradient(ellipse at 60% 50%, #f97316 0%, transparent 60%)" }} />
 
         <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
