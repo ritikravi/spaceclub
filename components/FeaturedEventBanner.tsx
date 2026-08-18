@@ -106,7 +106,7 @@ export default function FeaturedEventBanner() {
                     Register Now <ExternalLink size={16} />
                   </a>
                 ) : (
-                  <a href="/events"
+                  <a href="/events/register"
                     className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold text-base rounded-2xl transition-all shadow-xl shadow-orange-500/40 hover:shadow-orange-400/50 hover:scale-105">
                     Register Now →
                   </a>

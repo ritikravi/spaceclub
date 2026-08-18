@@ -150,45 +150,12 @@ export default function EventsPage() {
                   </div>
                   {ev.status === "upcoming" && (
                     <div className="shrink-0">
-                      {needsLogin && (
-                        <button
-                          onClick={() => signIn("google", { callbackUrl: "/events" })}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all"
-                        >
-                          <LogIn size={16} /> Sign in to Register
-                        </button>
-                      )}
-                      {needsApproval && (
-                        <div className="text-center">
-                          <button disabled className="px-5 py-2.5 bg-slate-600 text-slate-400 text-sm font-medium rounded-xl">
-                            Awaiting Approval
-                          </button>
-                          <p className="text-xs text-slate-500 mt-1">Your application must be approved first.</p>
-                        </div>
-                      )}
-                      {canRegister && (
-                        <button
-                          onClick={() => handleRegister(ev.id, ev.title)}
-                          disabled={registering === ev.id}
-                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                          {registering === ev.id ? (
-                            <>
-                              <Loader size={14} className="animate-spin" /> Registering...
-                            </>
-                          ) : (
-                            "Register Now"
-                          )}
-                        </button>
-                      )}
-                      {registered && (
-                        <div className="text-center">
-                          <button disabled className="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-xl">
-                            ✓ Registered
-                          </button>
-                          <p className="text-xs text-green-400 mt-1">+5 points earned!</p>
-                        </div>
-                      )}
+                      <a
+                        href="/events/register"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30"
+                      >
+                        Register Now →
+                      </a>
                     </div>
                   )}
                 </div>
