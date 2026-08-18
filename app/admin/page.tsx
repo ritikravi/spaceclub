@@ -13,9 +13,10 @@ import {
   uploadPhoto, getAnnouncements, createAnnouncement, toggleAnnouncement,
   deleteAnnouncement, broadcastToAll,
   getAdminEvents, createEvent, updateEvent, deleteEvent,
+  getEventRegistrations, deleteRegistration,
 } from "@/lib/adminApi";
 
-type Tab = "dashboard" | "applications" | "messages" | "members" | "announcements" | "events";
+type Tab = "dashboard" | "applications" | "messages" | "members" | "announcements" | "events" | "registrations";
 
 const divisions = ["Leadership","Aerospace","Robotics","AI & Data","Embedded Systems","Software","Research","Astronomy","Media & Design","Events","Outreach"];
 const roles = ["Faculty Head","Faculty Coordinator","Student Lead","Division Head","Core Member","Member"];
@@ -66,6 +67,9 @@ export default function AdminPage() {
   const [eventEditId, setEventEditId] = useState<string|null>(null);
   const [eventUploading, setEventUploading] = useState(false);
 
+  // Registrations
+  const [registrations, setRegistrations] = useState<any[]>([]);
+
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3000); };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +105,7 @@ export default function AdminPage() {
       else if (t === "members") setMembers(await getCoreMembers());
       else if (t === "announcements") setAnnouncements(await getAnnouncements());
       else if (t === "events") setEvents(await getAdminEvents());
+      else if (t === "registrations") setRegistrations(await getEventRegistrations());
     } catch (e: any) {
       setBackendError(e.message || "Cannot connect to backend.");
     }
@@ -253,6 +258,7 @@ export default function AdminPage() {
                 {id:"members",icon:Users,label:"Core Members"},
                 {id:"announcements",icon:Megaphone,label:"Announcements"},
                 {id:"events",icon:Radio,label:"Events"},
+                {id:"registrations",icon:Users,label:"Registrations"},
               ] as {id:Tab,icon:any,label:string}[]).map(item => (
                 <button key={item.id} onClick={()=>switchTab(item.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium mb-1 transition-all ${tab===item.id ? "bg-blue-600 text-white" : "hover:bg-blue-400/10"}`}
@@ -283,6 +289,7 @@ export default function AdminPage() {
                 {tab==="members"&&"Core Members"}
                 {tab==="announcements"&&"Announcements & Broadcast"}
                 {tab==="events"&&"Featured Events"}
+                {tab==="registrations"&&"Event Registrations"}
               </h1>
               <button onClick={()=>load(tab)} className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all hover:text-blue-400" style={{color:"var(--text-muted)",background:"var(--surface)",border:"1px solid var(--border)"}}>
                 <RefreshCw size={12}/> Refresh
@@ -744,6 +751,63 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+
+            {/* ── REGISTRATIONS ── */}
+            {!loading && tab==="registrations" && (
+              <div className="space-y-4">
+                {registrations.length===0 && <div className="text-center py-16" style={{color:"var(--text-faint)"}}>No event registrations yet.</div>}
+                <div className="glass rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-bold text-lg" style={{color:"var(--text)"}}>All Event Registrations</h3>
+                      <p className="text-xs mt-1" style={{color:"var(--text-muted)"}}>Total: {registrations.length} registrations</p>
+                    </div>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b" style={{borderColor:"var(--border)"}}>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Name</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Email</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Phone</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Event</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Branch</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Year</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Date</th>
+                          <th className="text-left py-3 px-2" style={{color:"var(--text-muted)"}}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {registrations.map((reg)=>(
+                          <tr key={reg._id} className="border-b hover:bg-white/5 transition-colors" style={{borderColor:"var(--border)"}}>
+                            <td className="py-3 px-2" style={{color:"var(--text)"}}>{reg.name}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text-muted)"}}>{reg.email}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text-muted)"}}>{reg.phone}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text)"}}>{reg.eventTitle}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text-muted)"}}>{reg.branch}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text-muted)"}}>{reg.year}</td>
+                            <td className="py-3 px-2 text-xs" style={{color:"var(--text-faint)"}}>{new Date(reg.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}</td>
+                            <td className="py-3 px-2">
+                              <button onClick={async()=>{
+                                if(!confirm("Delete this registration?")) return;
+                                try{await deleteRegistration(reg._id);setRegistrations(r=>r.filter(x=>x._id!==reg._id));showToast("Deleted.");}
+                                catch{showToast("Failed to delete.");}
+                              }} className="text-red-400 hover:text-red-300 transition-colors">
+                                <Trash2 size={14}/>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
 
       {/* ── BROADCAST MODAL ── */}
       {broadcastModal && (

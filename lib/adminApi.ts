@@ -129,3 +129,29 @@ export async function updateEvent(id: string, data: object) {
 export async function deleteEvent(id: string) {
   await fetch(`${API}/api/admin/events/${id}`, { method: "DELETE", headers: headers() });
 }
+
+// ── EVENT REGISTRATIONS ──
+export async function getEventRegistrations(eventTitle?: string) {
+  const query = eventTitle ? `?eventTitle=${encodeURIComponent(eventTitle)}` : "";
+  const res = await fetch(`${API}/api/admin/event-registrations${query}`, { headers: headers() });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function getEventRegistrationStats() {
+  const res = await fetch(`${API}/api/admin/event-registration-stats`, { headers: headers() });
+  if (!res.ok) return { total: 0, byEvent: [] };
+  return res.json();
+}
+
+export async function updateRegistrationStatus(id: string, status: string) {
+  const res = await fetch(`${API}/api/admin/event-registrations/${id}`, {
+    method: "PATCH", headers: headers(), body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error("Failed to update.");
+  return res.json();
+}
+
+export async function deleteRegistration(id: string) {
+  await fetch(`${API}/api/admin/event-registrations/${id}`, { method: "DELETE", headers: headers() });
+}

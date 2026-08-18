@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Event = require("../models/Event");
+const EventRegistration = require("../models/EventRegistration");
 
 // GET /api/events — list all events
 router.get("/", async (req, res) => {
@@ -22,16 +23,27 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Name, email, and phone are required." });
     }
 
-    // You can either store registrations in the Event model or create a separate Registration model
-    // For now, we'll just return success - you can extend this to save to database
-    
-    // TODO: Save registration to database
-    // Example: await EventRegistration.create({ name, email, phone, regNumber, branch, year, division, eventId, eventTitle });
+    // Check if already registered
+    const existing = await EventRegistration.findOne({ email, eventTitle });
+    if (existing) {
+      return res.status(409).json({ error: "You are already registered for this event." });
+    }
 
-    // TODO: Send confirmation email
-    console.log("Event registration:", { name, email, phone, eventTitle });
+    // Save registration
+    const registration = await EventRegistration.create({
+      eventId,
+      eventTitle,
+      name,
+      email,
+      phone,
+      regNumber,
+      branch,
+      year,
+      division,
+      status: "registered",
+    });
 
-    res.status(201).json({ message: "Registration successful!" });
+    res.status(201).json({ message: "Registration successful!", registration });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ error: "Server error." });

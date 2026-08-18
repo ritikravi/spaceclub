@@ -424,4 +424,52 @@ router.delete("/events/:id", auth, async (req, res) => {
   } catch { res.status(500).json({ error: "Server error." }); }
 });
 
+// ── EVENT REGISTRATIONS ───────────────────────────────
+const EventRegistration = require("../models/EventRegistration");
+
+// GET all event registrations (admin)
+router.get("/event-registrations", auth, async (req, res) => {
+  try {
+    const { eventTitle } = req.query;
+    const filter = eventTitle ? { eventTitle } : {};
+    const registrations = await EventRegistration.find(filter).sort({ createdAt: -1 });
+    res.json(registrations);
+  } catch (err) {
+    console.error("Event registrations error:", err);
+    res.json([]);
+  }
+});
+
+// GET registration stats
+router.get("/event-registration-stats", auth, async (req, res) => {
+  try {
+    const total = await EventRegistration.countDocuments();
+    const byEvent = await EventRegistration.aggregate([
+      { $group: { _id: "$eventTitle", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    res.json({ total, byEvent });
+  } catch (err) {
+    console.error("Registration stats error:", err);
+    res.json({ total: 0, byEvent: [] });
+  }
+});
+
+// PATCH update registration status
+router.patch("/event-registrations/:id", auth, async (req, res) => {
+  try {
+    const registration = await EventRegistration.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!registration) return res.status(404).json({ error: "Not found." });
+    res.json(registration);
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
+// DELETE registration
+router.delete("/event-registrations/:id", auth, async (req, res) => {
+  try {
+    await EventRegistration.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted." });
+  } catch { res.status(500).json({ error: "Server error." }); }
+});
+
 module.exports = router;
