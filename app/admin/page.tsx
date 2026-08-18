@@ -805,11 +805,8 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
-          </main>
-        </div>
-      </div>
 
-      {/* ── BROADCAST MODAL ── */}
+            {/* ── BROADCAST MODAL ── */}
       {broadcastModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={()=>setBroadcastModal(false)}>
           <div className="glass rounded-2xl p-6 w-full max-w-lg shadow-2xl" onClick={e=>e.stopPropagation()}>
