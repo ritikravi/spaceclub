@@ -99,18 +99,15 @@ export default function FeaturedEventBanner() {
               </div>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-                {/* Register button */}
-                {event.registrationLink ? (
-                  <a href={event.registrationLink} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold text-base rounded-2xl transition-all shadow-xl shadow-orange-500/40 hover:shadow-orange-400/50 hover:scale-105">
-                    Register Now <ExternalLink size={16} />
-                  </a>
-                ) : (
-                  <a href="/events/register"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold text-base rounded-2xl transition-all shadow-xl shadow-orange-500/40 hover:shadow-orange-400/50 hover:scale-105">
-                    Register Now →
-                  </a>
-                )}
+                {/* Register button - always goes to /events/register if no external link */}
+                <a 
+                  href={event.registrationLink || "/events/register"}
+                  target={event.registrationLink ? "_blank" : undefined}
+                  rel={event.registrationLink ? "noopener noreferrer" : undefined}
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold text-base rounded-2xl transition-all shadow-xl shadow-orange-500/40 hover:shadow-orange-400/50 hover:scale-105"
+                >
+                  Register Now {event.registrationLink ? <ExternalLink size={16} /> : "→"}
+                </a>
                 {event.image && (
                   <button onClick={() => setImgOpen(true)}
                     className="inline-flex items-center gap-2 px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold text-base rounded-2xl border border-white/20 hover:border-white/40 transition-all">
