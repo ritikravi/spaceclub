@@ -636,28 +636,54 @@ export default function AdminPage() {
                         <textarea rows={2} value={eventForm.description} onChange={e=>setEventForm((f:any)=>({...f,description:e.target.value}))} placeholder="Short description..."
                           className="w-full px-3 py-2 rounded-xl text-sm resize-none focus:outline-none" style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}/>
                       </div>
-                      {/* Image upload */}
+                      {/* Image upload or link */}
                       <div>
-                        <label className="block text-xs font-medium mb-1" style={{color:"var(--text-muted)"}}>Event Flyer / Image</label>
-                        <div className="flex items-center gap-3">
-                          {eventForm.image && <img src={eventForm.image} alt="flyer" className="w-16 h-16 rounded-lg object-cover border border-white/10"/>}
-                          <label className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm cursor-pointer transition-all border ${eventUploading?"opacity-50":"hover:border-blue-400"}`}
-                            style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>
-                            {eventUploading ? "Uploading..." : "📷 Upload Flyer"}
-                            <input type="file" accept="image/*" className="hidden" disabled={eventUploading} onChange={async(e)=>{
-                              const file = e.target.files?.[0]; if(!file) return;
-                              setEventUploading(true);
-                              try {
-                                const fd = new FormData(); fd.append("image", file);
-                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/upload?folder=events`,{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("admin_token")}`},body:fd});
-                                const d = await res.json();
-                                if(res.ok) setEventForm((f:any)=>({...f,image:d.url}));
-                                else showToast("Upload failed.");
-                              } catch { showToast("Upload failed."); }
-                              setEventUploading(false);
-                            }}/>
-                          </label>
-                          {eventForm.image && <button onClick={()=>setEventForm((f:any)=>({...f,image:""}))} className="text-xs text-red-400">Remove</button>}
+                        <label className="block text-xs font-medium mb-1.5" style={{color:"var(--text-muted)"}}>Event Flyer / Image</label>
+                        <div className="space-y-3">
+                          {/* Direct link input */}
+                          <div>
+                            <input 
+                              value={eventForm.image} 
+                              onChange={e=>setEventForm((f:any)=>({...f,image:e.target.value}))} 
+                              placeholder="Paste Cloudinary image URL here (recommended for best quality)..."
+                              className="w-full px-3 py-2 rounded-xl text-sm focus:outline-none" 
+                              style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text)"}}
+                            />
+                            <p className="text-xs mt-1" style={{color:"var(--text-faint)"}}>💡 For best quality: Upload to Cloudinary manually, then paste the URL above</p>
+                          </div>
+                          
+                          {/* OR upload */}
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs" style={{color:"var(--text-faint)"}}>— OR —</span>
+                            <label className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm cursor-pointer transition-all border ${eventUploading?"opacity-50":"hover:border-blue-400"}`}
+                              style={{background:"var(--surface)",border:"1px solid var(--border)",color:"var(--text-muted)"}}>
+                              {eventUploading ? "Uploading..." : "📷 Upload from Computer"}
+                              <input type="file" accept="image/*" className="hidden" disabled={eventUploading} onChange={async(e)=>{
+                                const file = e.target.files?.[0]; if(!file) return;
+                                setEventUploading(true);
+                                try {
+                                  const fd = new FormData(); fd.append("image", file);
+                                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL||"https://spaceclub.onrender.com"}/api/upload?folder=events`,{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("admin_token")}`},body:fd});
+                                  const d = await res.json();
+                                  if(res.ok) setEventForm((f:any)=>({...f,image:d.url}));
+                                  else showToast("Upload failed.");
+                                } catch { showToast("Upload failed."); }
+                                setEventUploading(false);
+                              }}/>
+                            </label>
+                          </div>
+
+                          {/* Preview */}
+                          {eventForm.image && (
+                            <div className="flex items-center gap-3 p-3 rounded-xl" style={{background:"var(--bg-alt)",border:"1px solid var(--border)"}}>
+                              <img src={eventForm.image} alt="flyer preview" className="w-20 h-20 rounded-lg object-cover border border-white/10"/>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium mb-1" style={{color:"var(--text)"}}>✓ Image Set</div>
+                                <div className="text-xs truncate" style={{color:"var(--text-faint)"}}>{eventForm.image}</div>
+                              </div>
+                              <button onClick={()=>setEventForm((f:any)=>({...f,image:""}))} className="shrink-0 text-xs text-red-400 hover:text-red-300 px-3 py-1 rounded-lg transition-colors" style={{background:"var(--surface)"}}>Remove</button>
+                            </div>
+                          )}
                         </div>
                       </div>
                       {/* Toggles */}
