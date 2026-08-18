@@ -13,6 +13,7 @@ const eventSchema = new mongoose.Schema(
     featured: { type: Boolean, default: false },
     image: { type: String }, // Cloudinary URL
     registrationContact: { type: String }, // e.g. phone number or link
+    registrationLink: { type: String }, // e.g. Google Form URL
     registrations: [{ name: String, email: String, registeredAt: { type: Date, default: Date.now } }],
   },
   { timestamps: true }

@@ -61,7 +61,7 @@ export default function AdminPage() {
 
   // Events
   const [events, setEvents] = useState<any[]>([]);
-  const [eventForm, setEventForm] = useState<any>({ title: "", type: "University Event", date: "", time: "", location: "", capacity: "", description: "", registrationContact: "", featured: false, image: "", status: "upcoming" });
+  const [eventForm, setEventForm] = useState<any>({ title: "", type: "University Event", date: "", time: "", location: "", capacity: "", description: "", registrationContact: "", registrationLink: "", featured: false, image: "", status: "upcoming" });
   const [eventAdding, setEventAdding] = useState(false);
   const [eventEditId, setEventEditId] = useState<string|null>(null);
   const [eventUploading, setEventUploading] = useState(false);
@@ -603,7 +603,7 @@ export default function AdminPage() {
                       <h3 className="font-bold text-base" style={{color:"var(--text)"}}>Featured Events</h3>
                       <p className="text-xs mt-0.5" style={{color:"var(--text-muted)"}}>The featured event shows as a banner at the top of your site. Only one can be featured at a time.</p>
                     </div>
-                    <button onClick={()=>{setEventAdding(true);setEventEditId(null);setEventForm({title:"",type:"University Event",date:"",time:"",location:"",capacity:"",description:"",registrationContact:"",featured:false,image:"",status:"upcoming"});}}
+                    <button onClick={()=>{setEventAdding(true);setEventEditId(null);setEventForm({title:"",type:"University Event",date:"",time:"",location:"",capacity:"",description:"",registrationContact:"",registrationLink:"",featured:false,image:"",status:"upcoming"});}}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 text-sm font-semibold rounded-xl transition-all border border-blue-400/30">
                       <Plus size={14}/> Add Event
                     </button>
@@ -622,6 +622,7 @@ export default function AdminPage() {
                           {label:"Location",key:"location",ph:"e.g. Room 30-603, LPU"},
                           {label:"Capacity",key:"capacity",ph:"e.g. All Schools of LPU"},
                           {label:"Registration Contact",key:"registrationContact",ph:"e.g. 9463457100 / 9897120653"},
+                          {label:"Registration Link",key:"registrationLink",ph:"e.g. https://forms.google.com/..."},
                         ].map(({label,key,ph})=>(
                           <div key={key}>
                             <label className="block text-xs font-medium mb-1" style={{color:"var(--text-muted)"}}>{label}</label>
@@ -706,7 +707,7 @@ export default function AdminPage() {
                             <button onClick={async()=>{const u=await updateEvent(ev._id,{featured:true});setEvents(l=>l.map(x=>({...x,featured:x._id===ev._id?true:false})));showToast("Set as featured!");}}
                               className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-400/10 hover:bg-orange-400/20 text-orange-400 border border-orange-400/20 transition-all">Feature</button>
                           )}
-                          <button onClick={()=>{setEventEditId(ev._id);setEventAdding(false);setEventForm({title:ev.title,type:ev.type,date:ev.date,time:ev.time||"",location:ev.location||"",capacity:ev.capacity||"",description:ev.description||"",registrationContact:ev.registrationContact||"",featured:ev.featured,image:ev.image||"",status:ev.status});}}
+                          <button onClick={()=>{setEventEditId(ev._id);setEventAdding(false);setEventForm({title:ev.title,type:ev.type,date:ev.date,time:ev.time||"",location:ev.location||"",capacity:ev.capacity||"",description:ev.description||"",registrationContact:ev.registrationContact||"",registrationLink:ev.registrationLink||"",featured:ev.featured,image:ev.image||"",status:ev.status});}}
                             className="w-8 h-8 rounded-lg flex items-center justify-center hover:text-blue-400 transition-all" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Edit2 size={13}/></button>
                           <button onClick={async()=>{await deleteEvent(ev._id);setEvents(l=>l.filter(x=>x._id!==ev._id));showToast("Deleted.");}}
                             className="w-8 h-8 rounded-lg flex items-center justify-center hover:text-red-400 transition-all" style={{background:"var(--surface)",color:"var(--text-muted)"}}><Trash2 size={13}/></button>
