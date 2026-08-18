@@ -3,9 +3,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { MapPin, ArrowRight, Clock } from "lucide-react";
 
 const events = [
-  { day: "15", month: "JAN", title: "Intro to CubeSat Workshop", type: "Workshop", location: "College Lab, Block A", time: "10:00 AM – 4:00 PM", color: "border-blue-400/50", badge: "text-blue-400 bg-blue-400/10" },
-  { day: "22", month: "JAN", title: "Astronomy Night — Saturn Opposition", type: "Observation", location: "College Rooftop", time: "8:00 PM – 11:00 PM", color: "border-purple-400/50", badge: "text-purple-400 bg-purple-400/10" },
-  { day: "05", month: "FEB", title: "NASA Space Apps Hackathon Prep", type: "Hackathon", location: "Seminar Hall", time: "9:00 AM – 5:00 PM", color: "border-orange-400/50", badge: "text-orange-400 bg-orange-400/10" },
+  { day: "21", month: "AUG", title: "National Space Day 2026 — Celebration", type: "University Event", location: "Room 30-603 & 604, LPU", time: "10:00 AM – 5:00 PM", color: "border-orange-400/50", badge: "text-orange-400 bg-orange-400/10" },
 ];
 
 export default function UpcomingEvents() {
